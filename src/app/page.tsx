@@ -1,20 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-
 export default function Page() {
   const [posts, setPosts] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [showAnimation, setShowAnimation] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [deduplicate, setDeduplicate] = useState(false);
-  const [likedPosts, setLikedPosts] = useState(new Set<string>());
-  const [repostedPosts, setRepostedPosts] = useState(new Set<string>());
-  const [loadingActions, setLoadingActions] = useState(new Set<string>());
-
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set<string>());
+  const [repostedPosts, setRepostedPosts] = useState<Set<string>>(new Set<string>());
+  const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set<string>());
   useEffect(() => {
     fetchFeed();
   }, []);
-
   const fetchFeed = async () => {
     try {
       const url = deduplicate 
@@ -24,7 +21,6 @@ export default function Page() {
       const data = await res.json();
       console.log("FEED DATA:", data);
       setPosts(data);
-
       const likedIds = new Set<string>();
       const repostedIds = new Set<string>();
       data.forEach((post: any) => {
@@ -37,14 +33,11 @@ export default function Page() {
       console.error("FEED ERROR", err);
     }
   };
-
   const handleLike = async (post: any) => {
     const isLiked = likedPosts.has(post.id);
     const action = isLiked ? "unlike" : "like";
     const actionKey = `${post.id}-like`;
-
     setLoadingActions(new Set([...loadingActions, actionKey]));
-
     try {
       const res = await fetch("http://localhost:5000/feed/like", {
         method: "POST",
@@ -55,7 +48,6 @@ export default function Page() {
           action,
         }),
       });
-
       if (res.ok) {
         const newLiked = new Set(likedPosts);
         if (isLiked) {
@@ -64,7 +56,6 @@ export default function Page() {
           newLiked.add(post.id);
         }
         setLikedPosts(newLiked);
-
         setPosts(posts.map((p: any) =>
           p.id === post.id
             ? {
@@ -83,14 +74,11 @@ export default function Page() {
       setLoadingActions(newLoading);
     }
   };
-
   const handleRepost = async (post: any) => {
     const isReposted = repostedPosts.has(post.id);
     const action = isReposted ? "unrepost" : "repost";
     const actionKey = `${post.id}-repost`;
-
     setLoadingActions(new Set([...loadingActions, actionKey]));
-
     try {
       const res = await fetch("http://localhost:5000/feed/repost", {
         method: "POST",
@@ -101,7 +89,6 @@ export default function Page() {
           action,
         }),
       });
-
       if (res.ok) {
         const newReposted = new Set(repostedPosts);
         if (isReposted) {
@@ -110,7 +97,6 @@ export default function Page() {
           newReposted.add(post.id);
         }
         setRepostedPosts(newReposted);
-
         setPosts(posts.map((p: any) =>
           p.id === post.id
             ? {
@@ -129,7 +115,6 @@ export default function Page() {
       setLoadingActions(newLoading);
     }
   };
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowAnimation(false);
@@ -140,7 +125,6 @@ export default function Page() {
     }, 5000);
     return () => clearTimeout(timer);
   }, []);
-
   return (
     <div 
       className="min-h-screen transition-colors duration-[10000ms]"
@@ -166,7 +150,6 @@ export default function Page() {
             opacity: 0;
           }
         }
-
         @keyframes krillFloat {
           0% {
             opacity: 0;
@@ -183,7 +166,6 @@ export default function Page() {
             transform: translateY(-100px);
           }
         }
-
         @keyframes logoGlow {
           0% {
             opacity: 0;
@@ -198,7 +180,6 @@ export default function Page() {
             transform: scale(1.2);
           }
         }
-
         @keyframes waterShimmer {
           0% {
             background-position: 0% 0%;
@@ -210,7 +191,6 @@ export default function Page() {
             background-position: 0% 0%;
           }
         }
-
         @keyframes zoomIn {
           0% {
             transform: scale(0.3) translateY(100px);
@@ -221,7 +201,6 @@ export default function Page() {
             opacity: 1;
           }
         }
-
         @keyframes fadeOutContent {
           0% {
             opacity: 1;
@@ -232,20 +211,16 @@ export default function Page() {
             pointer-events: none;
           }
         }
-
         .whale-animation {
           animation: whaleRise 5s linear forwards;
         }
-
         .krill {
           animation: krillFloat 5s linear forwards;
         }
-
         .logo-glow {
           animation: logoGlow 3s linear forwards;
           animation-delay: 2s;
         }
-
         .water-shimmer {
           position: fixed;
           top: 0;
@@ -257,16 +232,13 @@ export default function Page() {
           background-size: 400% 400%;
           animation: waterShimmer 12s ease-in-out infinite;
         }
-
         .zoom-in {
           animation: zoomIn 5s ease-out forwards;
         }
-
         .fade-out-content {
           animation: fadeOutContent 5s ease-out forwards;
         }
       `}</style>
-
       {/* WHALE EMERGENCE ANIMATION */}
       <div 
         className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center overflow-hidden transition-opacity duration-[3000ms]"
@@ -291,7 +263,6 @@ export default function Page() {
             </svg>
           </div>
         ))}
-
         <div className="whale-animation">
           <svg viewBox="0 0 300 200" className="w-80 h-auto" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -303,24 +274,19 @@ export default function Page() {
                 </feMerge>
               </filter>
             </defs>
-
             <ellipse cx="150" cy="100" rx="90" ry="45" fill="#1e3a4c" opacity="0.9" filter="url(#glow)" />
             <ellipse cx="80" cy="85" rx="35" ry="30" fill="#1e3a4c" opacity="0.9" />
             <path d="M 50 100 Q 70 120 90 115" stroke="#14b8a6" strokeWidth="2" fill="none" opacity="0.7" />
-
             <line x1="65" y1="105" x2="65" y2="145" stroke="#14b8a6" strokeWidth="2.5" opacity="0.8" />
             <line x1="75" y1="105" x2="75" y2="150" stroke="#14b8a6" strokeWidth="2.5" opacity="0.8" />
             <line x1="85" y1="105" x2="85" y2="152" stroke="#14b8a6" strokeWidth="2.5" opacity="0.8" />
             <line x1="95" y1="105" x2="95" y2="150" stroke="#14b8a6" strokeWidth="2.5" opacity="0.8" />
             <line x1="105" y1="105" x2="105" y2="145" stroke="#14b8a6" strokeWidth="2.5" opacity="0.8" />
-
             <circle cx="70" cy="75" r="4" fill="#14b8a6" opacity="0.8" />
-
             <path d="M 230 90 Q 270 70 280 100 Q 270 130 230 110" fill="#1e3a4c" opacity="0.8" />
             <path d="M 235 85 Q 265 65 275 95" stroke="#14b8a6" strokeWidth="1.5" fill="none" opacity="0.5" />
           </svg>
         </div>
-
         <div className="logo-glow absolute">
           <svg viewBox="0 0 120 120" className="w-32 h-32" xmlns="http://www.w3.org/2000/svg">
             <ellipse cx="60" cy="50" rx="28" ry="20" fill="none" stroke="#14b8a6" strokeWidth="1.5" opacity="0.5" />
@@ -336,7 +302,6 @@ export default function Page() {
           </svg>
         </div>
       </div>
-
       {/* SPLASH SCREEN */}
       <div 
         className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-[3000ms]"
@@ -367,13 +332,10 @@ export default function Page() {
                 <circle cx="60" cy="45" r="3" fill="#14b8a6" opacity="0.8" />
               </svg>
             </button>
-
             <h1 className="text-5xl font-light tracking-widest text-white">BALEEN</h1>
-
             <p className="text-lg text-gray-300 font-light max-w-sm leading-relaxed">
               Social, without the noise.
             </p>
-
             {/* SETTINGS BUTTON - BALEEN ICON (subservient) */}
             <div className="pt-8">
               <button
@@ -410,13 +372,11 @@ export default function Page() {
                   ✕
                 </button>
               </div>
-
               {/* LARGE BALEEN VISUAL WITH SETTINGS ON THE PLATES */}
               <div className="flex justify-center mb-8">
                 <svg viewBox="0 0 400 500" className="w-96 h-full max-h-96" xmlns="http://www.w3.org/2000/svg">
                   {/* Whale mouth opening */}
                   <path d="M 150 100 Q 200 120 250 100" stroke="#14b8a6" strokeWidth="2" fill="none" opacity="0.6" />
-
                   {/* BALEEN PLATE 1 - MUTE KEYWORDS */}
                   <g>
                     <line x1="80" y1="120" x2="80" y2="350" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
@@ -433,7 +393,6 @@ export default function Page() {
                       football
                     </text>
                   </g>
-
                   {/* BALEEN PLATE 2 - HIGHLIGHT KEYWORDS */}
                   <g>
                     <line x1="150" y1="120" x2="150" y2="360" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
@@ -450,7 +409,6 @@ export default function Page() {
                       housing
                     </text>
                   </g>
-
                   {/* BALEEN PLATE 3 - DEDUPLICATION TOGGLE */}
                   <g>
                     <line x1="220" y1="120" x2="220" y2="365" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
@@ -482,7 +440,6 @@ export default function Page() {
                       within 24 hours
                     </text>
                   </g>
-
                   {/* BALEEN PLATE 4 - FEED ACTION */}
                   <g>
                     <line x1="290" y1="120" x2="290" y2="360" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
@@ -493,14 +450,12 @@ export default function Page() {
                       FEED
                     </text>
                   </g>
-
                   {/* BALEEN PLATE 5 */}
                   <g>
                     <line x1="350" y1="120" x2="350" y2="355" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
                   </g>
                 </svg>
               </div>
-
               {/* INTERACTIVE CONTROLS */}
               <div className="flex flex-col gap-6 text-center">
                 <label className="flex items-center justify-center gap-3 cursor-pointer text-white">
@@ -515,7 +470,6 @@ export default function Page() {
                   />
                   <span className="text-sm">Hide duplicate posts (24h window)</span>
                 </label>
-
                 <button
                   onClick={() => {
                     setShowSettings(false);
@@ -530,7 +484,6 @@ export default function Page() {
           </div>
         )}
       </div>
-
       {/* FEED */}
       <div 
         className="transition-opacity duration-[3000ms]"
@@ -541,7 +494,6 @@ export default function Page() {
         }}
       >
         <div className="water-shimmer" style={{ position: 'fixed', pointerEvents: 'none' }} />
-
         <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-center relative z-10">
           <button
             onClick={() => setIsOpen(false)}
@@ -563,7 +515,6 @@ export default function Page() {
             <span className="text-sm font-semibold text-slate-900">Baleen</span>
           </button>
         </div>
-
         <div className="p-6 max-w-2xl mx-auto">
           {posts.length === 0 ? (
             <div className="text-center text-slate-500 py-12">
@@ -596,11 +547,9 @@ export default function Page() {
                     {new Date(post.timestamp).toLocaleString()}
                   </span>
                 </div>
-
                 <div className="mb-3 whitespace-pre-wrap text-slate-900 text-sm leading-relaxed">
                   {post.text}
                 </div>
-
                 {post.images && post.images.length > 0 && (
                   <div className="grid grid-cols-2 gap-2 mb-3">
                     {post.images.map((url: string, idx: number) => (
@@ -614,7 +563,6 @@ export default function Page() {
                     ))}
                   </div>
                 )}
-
                 {post.links && post.links.length > 0 && (
                   <div className="text-teal-600 underline text-sm mt-1 space-y-1">
                     {post.links.map((url: string, idx: number) => (
@@ -626,7 +574,6 @@ export default function Page() {
                     ))}
                   </div>
                 )}
-
                 <div className="flex justify-end text-slate-400 text-xs mt-3 space-x-6">
                   <button
                     onClick={() => handleLike(post)}
@@ -638,7 +585,6 @@ export default function Page() {
                     <span>{likedPosts.has(post.id) ? "❤️" : "🤍"}</span>
                     <span>{post.likeCount}</span>
                   </button>
-
                   <button
                     onClick={() => handleRepost(post)}
                     disabled={loadingActions.has(`${post.id}-repost`)}
@@ -649,7 +595,6 @@ export default function Page() {
                     <span>{repostedPosts.has(post.id) ? "🔄" : "↻"}</span>
                     <span>{post.repostCount}</span>
                   </button>
-
                   <span>💬 {Math.floor(Math.random() * 20)}</span>
                 </div>
               </div>
