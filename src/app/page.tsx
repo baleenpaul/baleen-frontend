@@ -15,8 +15,8 @@ export default function Page() {
   const fetchFeed = async () => {
     try {
       const url = deduplicate 
-        ? "http://localhost:5000/feed?deduplicate=true"
-        : "http://localhost:5000/feed";
+        ? "https://baleen-backend.onrender.com/feed?deduplicate=true"
+        : "https://baleen-backend.onrender.com/feed";
       const res = await fetch(url);
       const data = await res.json();
       console.log("FEED DATA:", data);
@@ -39,7 +39,7 @@ export default function Page() {
     const actionKey = `${post.id}-like`;
     setLoadingActions(new Set([...loadingActions, actionKey]));
     try {
-      const res = await fetch("http://localhost:5000/feed/like", {
+      const res = await fetch("https://baleen-backend.onrender.com/feed/like", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -80,7 +80,7 @@ export default function Page() {
     const actionKey = `${post.id}-repost`;
     setLoadingActions(new Set([...loadingActions, actionKey]));
     try {
-      const res = await fetch("http://localhost:5000/feed/repost", {
+      const res = await fetch("https://baleen-backend.onrender.com/feed/repost", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
