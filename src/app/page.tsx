@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 export default function Page() {
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [showAnimation, setShowAnimation] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
