@@ -17,7 +17,7 @@ interface WhitelistItem {
  * AISlop FilterPanel Component
  * Provides UI for controlling AI slop filtering
  */
-export default function AISlop FilterPanel({
+export default function AISlopFilterPanel({
   onFilterChange,
   initialSettings = {
     enabled: false,
