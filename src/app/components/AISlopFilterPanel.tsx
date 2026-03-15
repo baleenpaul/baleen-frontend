@@ -14,7 +14,7 @@ interface WhitelistItem {
 }
 
 /**
- * AISlop FilterPanel Component
+ * AISlopFilterPanel Component
  * Provides UI for controlling AI slop filtering
  */
 export default function AISlopFilterPanel({
@@ -246,7 +246,7 @@ export default function AISlopFilterPanel({
  * Optional: AI Score Badge Component
  * Display on individual feed items
  */
-export function AISlop ScoreBadge({
+export function AISlopScoreBadge({
   score,
   confidence,
 }: {
