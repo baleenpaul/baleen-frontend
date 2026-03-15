@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import AISlopFilterPanel from "./components/AISlopFilterPanel";
 
 export default function Page() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -16,6 +15,7 @@ export default function Page() {
   const [aiFilterEnabled, setAiFilterEnabled] = useState(false);
   const [aiSensitivity, setAiSensitivity] = useState(50);
   const [aiWhitelist, setAiWhitelist] = useState<string[]>([]);
+  const [aiWhitelistInput, setAiWhitelistInput] = useState("");
 
   useEffect(() => {
     fetchFeed();
@@ -50,7 +50,6 @@ export default function Page() {
       const res = await fetch(url);
       const data = await res.json();
       
-      // Handle both array and object responses
       const feedItems = Array.isArray(data) ? data : data.items || data;
       
       console.log("FEED DATA:", feedItems);
@@ -69,13 +68,16 @@ export default function Page() {
     }
   };
 
-  const handleFilterChange = (settings: any) => {
-    setAiFilterEnabled(settings.enabled);
-    setAiSensitivity(settings.sensitivity);
-    setAiWhitelist(settings.whitelist);
+  const handleAiWhitelistAdd = () => {
+    if (!aiWhitelistInput.trim()) return;
+    const newWhitelist = [...aiWhitelist, aiWhitelistInput.trim()];
+    setAiWhitelist(newWhitelist);
+    setAiWhitelistInput("");
+  };
 
-    // Refetch feed with new filter settings
-    fetchFeed(settings.enabled, settings.sensitivity, settings.whitelist);
+  const handleAiWhitelistRemove = (index: number) => {
+    const newWhitelist = aiWhitelist.filter((_, i) => i !== index);
+    setAiWhitelist(newWhitelist);
   };
 
   const handleLike = async (post: any) => {
@@ -363,7 +365,6 @@ export default function Page() {
       >
         {!showSettings ? (
           <div className="text-center space-y-8 max-w-sm pointer-events-auto fade-out-content" style={{ animationPlayState: showSettings ? 'running' : 'paused' }}>
-            {/* MAIN LOGO */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="flex justify-center hover:opacity-80 transition-opacity"
@@ -386,7 +387,6 @@ export default function Page() {
             <p className="text-lg text-gray-300 font-light max-w-sm leading-relaxed">
               Social, without the noise.
             </p>
-            {/* SETTINGS BUTTON */}
             <div className="pt-8">
               <button
                 onClick={() => setShowSettings(true)}
@@ -407,9 +407,9 @@ export default function Page() {
             </div>
           </div>
         ) : (
-          // EXPANDED SETTINGS VIEW
-          <div className="zoom-in w-full h-full flex flex-col items-center justify-center p-8 pointer-events-auto">
-            <div className="max-w-2xl space-y-8">
+          // EXPANDED SETTINGS VIEW WITH AI SLOP FILTER
+          <div className="zoom-in w-full h-full flex flex-col items-center justify-center p-8 pointer-events-auto overflow-y-auto">
+            <div className="max-w-3xl space-y-8 py-8">
               {/* Close button */}
               <div className="flex justify-end">
                 <button
@@ -420,113 +420,193 @@ export default function Page() {
                   ✕
                 </button>
               </div>
-              {/* BALEEN VISUAL WITH SETTINGS */}
+
+              {/* BALEEN VISUAL */}
               <div className="flex justify-center mb-8">
-                <svg viewBox="0 0 400 500" className="w-96 h-full max-h-96" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M 150 100 Q 200 120 250 100" stroke="#14b8a6" strokeWidth="2" fill="none" opacity="0.6" />
-                  {/* BALEEN PLATE 1 - MUTE KEYWORDS */}
+                <svg viewBox="0 0 500 500" className="w-full max-w-lg max-h-96" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M 150 80 Q 250 100 350 80" stroke="#14b8a6" strokeWidth="2" fill="none" opacity="0.6" />
+                  
+                  {/* PLATE 1 - MUTE */}
                   <g>
-                    <line x1="80" y1="120" x2="80" y2="350" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
-                    <text x="90" y="155" className="text-[13px] fill-gray-300" fontFamily="Arial" fontWeight="600">
-                      MUTE
-                    </text>
-                    <text x="90" y="180" className="text-[11px] fill-gray-400" fontFamily="Arial">
-                      trump
-                    </text>
-                    <text x="90" y="205" className="text-[11px] fill-gray-400" fontFamily="Arial">
-                      bitcoin
-                    </text>
-                    <text x="90" y="230" className="text-[11px] fill-gray-400" fontFamily="Arial">
-                      football
-                    </text>
+                    <line x1="80" y1="100" x2="80" y2="420" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
+                    <text x="90" y="140" className="text-[13px] fill-gray-300" fontFamily="Arial" fontWeight="600">MUTE</text>
+                    <text x="90" y="165" className="text-[10px] fill-gray-400" fontFamily="Arial">trump</text>
+                    <text x="90" y="185" className="text-[10px] fill-gray-400" fontFamily="Arial">bitcoin</text>
+                    <text x="90" y="205" className="text-[10px] fill-gray-400" fontFamily="Arial">football</text>
                   </g>
-                  {/* BALEEN PLATE 2 - HIGHLIGHT KEYWORDS */}
+                  
+                  {/* PLATE 2 - HIGHLIGHT */}
                   <g>
-                    <line x1="150" y1="120" x2="150" y2="360" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
-                    <text x="160" y="155" className="text-[13px] fill-gray-300" fontFamily="Arial" fontWeight="600">
-                      HIGHLIGHT
-                    </text>
-                    <text x="160" y="180" className="text-[11px] fill-gray-400" fontFamily="Arial">
-                      ireland
-                    </text>
-                    <text x="160" y="205" className="text-[11px] fill-gray-400" fontFamily="Arial">
-                      climate
-                    </text>
-                    <text x="160" y="230" className="text-[11px] fill-gray-400" fontFamily="Arial">
-                      housing
-                    </text>
+                    <line x1="150" y1="100" x2="150" y2="430" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
+                    <text x="160" y="140" className="text-[13px] fill-gray-300" fontFamily="Arial" fontWeight="600">HIGHLIGHT</text>
+                    <text x="160" y="165" className="text-[10px] fill-gray-400" fontFamily="Arial">ireland</text>
+                    <text x="160" y="185" className="text-[10px] fill-gray-400" fontFamily="Arial">climate</text>
+                    <text x="160" y="205" className="text-[10px] fill-gray-400" fontFamily="Arial">housing</text>
                   </g>
-                  {/* BALEEN PLATE 3 - DEDUPLICATION TOGGLE */}
+                  
+                  {/* PLATE 3 - DEDUP */}
                   <g>
-                    <line x1="220" y1="120" x2="220" y2="365" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
-                    <text x="230" y="155" className="text-[13px] fill-gray-300" fontFamily="Arial" fontWeight="600">
-                      DEDUP
-                    </text>
-                    <rect
-                      x="230"
-                      y="175"
-                      width="55"
-                      height="24"
-                      rx="12"
-                      fill={deduplicate ? "#14b8a6" : "none"}
-                      stroke="#14b8a6"
-                      strokeWidth="2"
-                      opacity="0.6"
-                    />
-                    <circle
-                      cx={deduplicate ? "268" : "237"}
-                      cy="187"
-                      r="8"
-                      fill="#14b8a6"
-                      opacity="0.8"
-                    />
-                    <text x="230" y="235" className="text-[10px] fill-gray-400" fontFamily="Arial">
-                      Hide duplicates
-                    </text>
-                    <text x="230" y="253" className="text-[10px] fill-gray-400" fontFamily="Arial">
-                      within 24 hours
-                    </text>
+                    <line x1="220" y1="100" x2="220" y2="435" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
+                    <text x="230" y="140" className="text-[13px] fill-gray-300" fontFamily="Arial" fontWeight="600">DEDUP</text>
+                    <rect x="230" y="160" width="55" height="24" rx="12" fill={deduplicate ? "#14b8a6" : "none"} stroke="#14b8a6" strokeWidth="2" opacity="0.6" />
+                    <circle cx={deduplicate ? "268" : "237"} cy="172" r="8" fill="#14b8a6" opacity="0.8" />
                   </g>
-                  {/* BALEEN PLATE 4 - FEED ACTION */}
+                  
+                  {/* PLATE 4 - AI SLOP */}
                   <g>
-                    <line x1="290" y1="120" x2="290" y2="360" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
-                    <text x="300" y="185" className="text-[12px] fill-gray-300" fontFamily="Arial" fontWeight="600">
-                      ENTER
-                    </text>
-                    <text x="300" y="210" className="text-[12px] fill-gray-300" fontFamily="Arial" fontWeight="600">
-                      FEED
-                    </text>
+                    <line x1="290" y1="100" x2="290" y2="440" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
+                    <text x="300" y="140" className="text-[13px] fill-gray-300" fontFamily="Arial" fontWeight="600">AI SLOP</text>
+                    <rect x="300" y="160" width="55" height="24" rx="12" fill={aiFilterEnabled ? "#14b8a6" : "none"} stroke="#14b8a6" strokeWidth="2" opacity="0.6" />
+                    <circle cx={aiFilterEnabled ? "338" : "303"} cy="172" r="8" fill="#14b8a6" opacity="0.8" />
                   </g>
-                  {/* BALEEN PLATE 5 */}
+                  
+                  {/* PLATE 5 - ENTER FEED */}
                   <g>
-                    <line x1="350" y1="120" x2="350" y2="355" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
+                    <line x1="360" y1="100" x2="360" y2="425" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
+                    <text x="370" y="165" className="text-[12px] fill-gray-300" fontFamily="Arial" fontWeight="600">ENTER</text>
+                    <text x="370" y="190" className="text-[12px] fill-gray-300" fontFamily="Arial" fontWeight="600">FEED</text>
+                  </g>
+                  
+                  {/* PLATE 6 */}
+                  <g>
+                    <line x1="420" y1="100" x2="420" y2="420" stroke="#14b8a6" strokeWidth="4" opacity="0.8" />
                   </g>
                 </svg>
               </div>
-              {/* INTERACTIVE CONTROLS */}
-              <div className="flex flex-col gap-6 text-center">
-                <label className="flex items-center justify-center gap-3 cursor-pointer text-white">
-                  <input
-                    type="checkbox"
-                    checked={deduplicate}
-                    onChange={(e) => {
-                      setDeduplicate(e.target.checked);
-                      fetchFeed(aiFilterEnabled, aiSensitivity, aiWhitelist);
-                    }}
-                    className="w-5 h-5 accent-teal-500"
-                  />
-                  <span className="text-sm">Hide duplicate posts (24h window)</span>
-                </label>
-                <button
-                  onClick={() => {
-                    setShowSettings(false);
-                    setIsOpen(true);
-                  }}
-                  className="px-12 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-base font-semibold"
-                >
-                  Enter Feed
-                </button>
+
+              {/* FILTER CONTROLS */}
+              <div className="space-y-6 bg-slate-800 bg-opacity-50 p-6 rounded-lg">
+                {/* DEDUP Control */}
+                <div>
+                  <label className="flex items-center gap-3 cursor-pointer text-white">
+                    <input
+                      type="checkbox"
+                      checked={deduplicate}
+                      onChange={(e) => {
+                        setDeduplicate(e.target.checked);
+                        fetchFeed(aiFilterEnabled, aiSensitivity, aiWhitelist);
+                      }}
+                      className="w-5 h-5 accent-teal-500"
+                    />
+                    <span className="text-sm">Hide duplicate posts (24h window)</span>
+                  </label>
+                </div>
+
+                {/* AI SLOP FILTER Controls */}
+                <div className="border-t border-slate-600 pt-4">
+                  <div className="space-y-4">
+                    {/* Toggle */}
+                    <label className="flex items-center gap-3 cursor-pointer text-white">
+                      <input
+                        type="checkbox"
+                        checked={aiFilterEnabled}
+                        onChange={(e) => {
+                          setAiFilterEnabled(e.target.checked);
+                          fetchFeed(e.target.checked, aiSensitivity, aiWhitelist);
+                        }}
+                        className="w-5 h-5 accent-teal-500"
+                      />
+                      <span className="text-sm font-semibold">🐋 Filter AI Slop</span>
+                    </label>
+
+                    {/* Sensitivity Slider */}
+                    {aiFilterEnabled && (
+                      <div className="ml-8 space-y-3">
+                        <label className="block text-sm text-gray-300">
+                          Baleen Sensitivity
+                          <span className="ml-2 text-gray-400">
+                            {aiSensitivity === 0
+                              ? "Strict"
+                              : aiSensitivity === 50
+                              ? "Medium"
+                              : aiSensitivity === 100
+                              ? "Lenient"
+                              : `${aiSensitivity}%`}
+                          </span>
+                        </label>
+                        <input
+                          type="range"
+                          min="0"
+                          max="100"
+                          value={aiSensitivity}
+                          onChange={(e) => {
+                            const newSensitivity = parseInt(e.target.value);
+                            setAiSensitivity(newSensitivity);
+                            fetchFeed(aiFilterEnabled, newSensitivity, aiWhitelist);
+                          }}
+                          className="w-full h-2 bg-teal-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
+                        />
+                        <div className="flex justify-between text-xs text-gray-400">
+                          <span>Strict</span>
+                          <span>Medium</span>
+                          <span>Lenient</span>
+                        </div>
+
+                        {/* Whitelist */}
+                        <div className="space-y-2 pt-2">
+                          <label className="block text-xs text-gray-300 font-semibold">
+                            Feed Between the Baleen
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={aiWhitelistInput}
+                              onChange={(e) => setAiWhitelistInput(e.target.value)}
+                              onKeyPress={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  handleAiWhitelistAdd();
+                                }
+                              }}
+                              placeholder="@author or #hashtag"
+                              className="flex-1 px-2 py-1 bg-slate-700 border border-slate-600 rounded text-xs text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-teal-500"
+                            />
+                            <button
+                              onClick={handleAiWhitelistAdd}
+                              className="px-3 py-1 bg-teal-600 text-white rounded text-xs font-medium hover:bg-teal-700 transition"
+                            >
+                              Add
+                            </button>
+                          </div>
+
+                          {/* Whitelist Tags */}
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {aiWhitelist.length === 0 ? (
+                              <p className="text-xs text-gray-400">No whitelisted content</p>
+                            ) : (
+                              aiWhitelist.map((item, index) => (
+                                <div
+                                  key={index}
+                                  className="flex items-center gap-1 bg-teal-900 text-teal-200 px-2 py-1 rounded text-xs"
+                                >
+                                  <span>{item}</span>
+                                  <button
+                                    onClick={() => handleAiWhitelistRemove(index)}
+                                    className="text-teal-200 hover:text-teal-100 font-bold"
+                                  >
+                                    ×
+                                  </button>
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
+
+              {/* ENTER FEED BUTTON */}
+              <button
+                onClick={() => {
+                  setShowSettings(false);
+                  setIsOpen(true);
+                }}
+                className="w-full px-12 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-base font-semibold"
+              >
+                Enter Feed
+              </button>
             </div>
           </div>
         )}
@@ -544,7 +624,7 @@ export default function Page() {
         <div className="water-shimmer" style={{ position: 'fixed', pointerEvents: 'none' }} />
         
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-center relative z-10">
+        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between relative z-10">
           <button
             onClick={() => setIsOpen(false)}
             className="flex items-center gap-2 hover:opacity-70 transition-opacity"
@@ -564,22 +644,18 @@ export default function Page() {
             </svg>
             <span className="text-sm font-semibold text-slate-900">Baleen</span>
           </button>
+
+          <button
+            onClick={() => setIsOpen(false)}
+            className="text-slate-500 hover:text-slate-700 transition text-lg"
+            title="Filter settings"
+          >
+            ⚙️
+          </button>
         </div>
 
         <div className="p-6 max-w-2xl mx-auto">
-          {/* AI SLOP FILTER PANEL */}
-          <div className="mb-8">
-            <AISlopFilterPanel 
-              onFilterChange={handleFilterChange}
-              initialSettings={{
-                enabled: aiFilterEnabled,
-                sensitivity: aiSensitivity,
-                whitelist: aiWhitelist,
-              }}
-            />
-          </div>
-
-          {/* FEED ITEMS */}
+          {/* FEED ITEMS - CLEAN, NO FILTER PANEL */}
           {posts.length === 0 ? (
             <div className="text-center text-slate-500 py-12">
               <p>Loading your feed...</p>
