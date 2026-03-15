@@ -13,10 +13,6 @@ interface WhitelistItem {
   value: string;
 }
 
-/**
- * AISlopFilterPanel Component
- * Provides UI for controlling AI slop filtering
- */
 export default function AISlopFilterPanel({
   onFilterChange,
   initialSettings = {
@@ -38,7 +34,6 @@ export default function AISlopFilterPanel({
     })
   );
 
-  // Notify parent of changes
   const notifyChange = (newEnabled: boolean, newSensitivity: number, newWhitelist: WhitelistItem[]) => {
     const settingsString = newWhitelist
       .map((w) => `${w.type}:${w.value}`)
@@ -51,21 +46,18 @@ export default function AISlopFilterPanel({
     });
   };
 
-  // Toggle filter on/off
   const handleToggle = () => {
     const newEnabled = !enabled;
     setEnabled(newEnabled);
     notifyChange(newEnabled, sensitivity, whitelist);
   };
 
-  // Change sensitivity slider
   const handleSensitivityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newSensitivity = parseInt(e.target.value);
     setSensitivity(newSensitivity);
     notifyChange(enabled, newSensitivity, whitelist);
   };
 
-  // Add to whitelist
   const handleAddWhitelist = () => {
     if (!whitelistInput.trim()) return;
 
@@ -75,10 +67,10 @@ export default function AISlopFilterPanel({
 
     if (input.startsWith("@")) {
       type = "author";
-      value = input.slice(1); // Remove @
+      value = input.slice(1);
     } else if (input.startsWith("#")) {
       type = "hashtag";
-      value = input.slice(1); // Remove #
+      value = input.slice(1);
     }
 
     const newWhitelist = [...whitelist, { type, value }];
@@ -87,14 +79,12 @@ export default function AISlopFilterPanel({
     notifyChange(enabled, sensitivity, newWhitelist);
   };
 
-  // Remove from whitelist
   const handleRemoveWhitelist = (index: number) => {
     const newWhitelist = whitelist.filter((_, i) => i !== index);
     setWhitelist(newWhitelist);
     notifyChange(enabled, sensitivity, newWhitelist);
   };
 
-  // Handle Enter key in whitelist input
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -104,7 +94,6 @@ export default function AISlopFilterPanel({
 
   return (
     <div className="bg-gradient-to-b from-blue-50 to-transparent p-6 rounded-lg border border-blue-200 space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">
@@ -115,7 +104,6 @@ export default function AISlopFilterPanel({
           </p>
         </div>
 
-        {/* Toggle Switch */}
         <button
           onClick={handleToggle}
           className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
@@ -130,10 +118,8 @@ export default function AISlopFilterPanel({
         </button>
       </div>
 
-      {/* Filter Controls - Only show when enabled */}
       {enabled && (
         <div className="space-y-6">
-          {/* Sensitivity Slider */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               Baleen Sensitivity
@@ -169,7 +155,6 @@ export default function AISlopFilterPanel({
             </p>
           </div>
 
-          {/* Whitelist - "Feed Between the Baleen" */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-3">
               🐋 Feed Between the Baleen (Whitelist)
@@ -180,7 +165,6 @@ export default function AISlopFilterPanel({
               suspicious
             </p>
 
-            {/* Whitelist Input */}
             <div className="flex gap-2 mb-3">
               <input
                 type="text"
@@ -198,7 +182,6 @@ export default function AISlopFilterPanel({
               </button>
             </div>
 
-            {/* Whitelist Tags */}
             <div className="flex flex-wrap gap-2">
               {whitelist.length === 0 ? (
                 <p className="text-sm text-gray-500">No whitelisted content</p>
@@ -224,7 +207,6 @@ export default function AISlopFilterPanel({
             </div>
           </div>
 
-          {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded p-3 text-xs text-gray-700 space-y-1">
             <p>
               <strong>How it works:</strong> Reads the first 10 comments on each
@@ -242,10 +224,6 @@ export default function AISlopFilterPanel({
   );
 }
 
-/**
- * Optional: AI Score Badge Component
- * Display on individual feed items
- */
 export function AISlopScoreBadge({
   score,
   confidence,
@@ -255,7 +233,7 @@ export function AISlopScoreBadge({
 }) {
   if (score === undefined || score === 0) return null;
 
-  let bgColor = "bg-green-100 text-green-700"; // low
+  let bgColor = "bg-green-100 text-green-700";
   let icon = "✓";
 
   if (score > 60) {
