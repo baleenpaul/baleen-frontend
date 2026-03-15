@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import AISlop FilterPanel from "./components/AISlop FilterPanel";
+import AISlop FilterPanel from "./components/AISlopFilterPanel";
 
 export default function Page() {
   const [posts, setPosts] = useState<any[]>([]);
@@ -569,7 +569,7 @@ export default function Page() {
         <div className="p-6 max-w-2xl mx-auto">
           {/* AI SLOP FILTER PANEL */}
           <div className="mb-8">
-            <AISlop FilterPanel 
+            <AISlopFilterPanel 
               onFilterChange={handleFilterChange}
               initialSettings={{
                 enabled: aiFilterEnabled,
