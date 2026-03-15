@@ -1,5 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
+import AISlop FilterPanel from "./components/AISlop FilterPanel";
+
 export default function Page() {
   const [posts, setPosts] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -9,21 +11,54 @@ export default function Page() {
   const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set<string>());
   const [repostedPosts, setRepostedPosts] = useState<Set<string>>(new Set<string>());
   const [loadingActions, setLoadingActions] = useState<Set<string>>(new Set<string>());
+  
+  // AI Filter state
+  const [aiFilterEnabled, setAiFilterEnabled] = useState(false);
+  const [aiSensitivity, setAiSensitivity] = useState(50);
+  const [aiWhitelist, setAiWhitelist] = useState<string[]>([]);
+
   useEffect(() => {
     fetchFeed();
   }, []);
-  const fetchFeed = async () => {
+
+  const fetchFeed = async (
+    filterAI?: boolean,
+    sensitivity?: number,
+    whitelist?: string[]
+  ) => {
     try {
-      const url = deduplicate 
-        ? "https://baleen-backend.onrender.com/feed?deduplicate=true"
+      const params = new URLSearchParams();
+      
+      if (deduplicate) {
+        params.append("deduplicate", "true");
+      }
+      
+      if (filterAI ?? aiFilterEnabled) {
+        params.append("filterAI", "true");
+        params.append("sensitivity", String(sensitivity ?? aiSensitivity));
+        
+        const whitelistToUse = whitelist ?? aiWhitelist;
+        if (whitelistToUse.length > 0) {
+          params.append("whitelist", whitelistToUse.join(","));
+        }
+      }
+
+      const url = params.toString()
+        ? `https://baleen-backend.onrender.com/feed?${params.toString()}`
         : "https://baleen-backend.onrender.com/feed";
+      
       const res = await fetch(url);
       const data = await res.json();
-      console.log("FEED DATA:", data);
-      setPosts(data);
+      
+      // Handle both array and object responses
+      const feedItems = Array.isArray(data) ? data : data.items || data;
+      
+      console.log("FEED DATA:", feedItems);
+      setPosts(feedItems);
+
       const likedIds = new Set<string>();
       const repostedIds = new Set<string>();
-      data.forEach((post: any) => {
+      feedItems.forEach((post: any) => {
         if (post.liked) likedIds.add(post.id);
         if (post.reposted) repostedIds.add(post.id);
       });
@@ -33,6 +68,16 @@ export default function Page() {
       console.error("FEED ERROR", err);
     }
   };
+
+  const handleFilterChange = (settings: any) => {
+    setAiFilterEnabled(settings.enabled);
+    setAiSensitivity(settings.sensitivity);
+    setAiWhitelist(settings.whitelist);
+
+    // Refetch feed with new filter settings
+    fetchFeed(settings.enabled, settings.sensitivity, settings.whitelist);
+  };
+
   const handleLike = async (post: any) => {
     const isLiked = likedPosts.has(post.id);
     const action = isLiked ? "unlike" : "like";
@@ -74,6 +119,7 @@ export default function Page() {
       setLoadingActions(newLoading);
     }
   };
+
   const handleRepost = async (post: any) => {
     const isReposted = repostedPosts.has(post.id);
     const action = isReposted ? "unrepost" : "repost";
@@ -115,6 +161,7 @@ export default function Page() {
       setLoadingActions(newLoading);
     }
   };
+
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowAnimation(false);
@@ -125,6 +172,7 @@ export default function Page() {
     }, 5000);
     return () => clearTimeout(timer);
   }, []);
+
   return (
     <div 
       className="min-h-screen transition-colors duration-[10000ms]"
@@ -239,6 +287,7 @@ export default function Page() {
           animation: fadeOutContent 5s ease-out forwards;
         }
       `}</style>
+
       {/* WHALE EMERGENCE ANIMATION */}
       <div 
         className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center overflow-hidden transition-opacity duration-[3000ms]"
@@ -302,6 +351,7 @@ export default function Page() {
           </svg>
         </div>
       </div>
+
       {/* SPLASH SCREEN */}
       <div 
         className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-[3000ms]"
@@ -313,7 +363,7 @@ export default function Page() {
       >
         {!showSettings ? (
           <div className="text-center space-y-8 max-w-sm pointer-events-auto fade-out-content" style={{ animationPlayState: showSettings ? 'running' : 'paused' }}>
-            {/* MAIN LOGO - CENTRAL & LARGE */}
+            {/* MAIN LOGO */}
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="flex justify-center hover:opacity-80 transition-opacity"
@@ -336,7 +386,7 @@ export default function Page() {
             <p className="text-lg text-gray-300 font-light max-w-sm leading-relaxed">
               Social, without the noise.
             </p>
-            {/* SETTINGS BUTTON - BALEEN ICON (subservient) */}
+            {/* SETTINGS BUTTON */}
             <div className="pt-8">
               <button
                 onClick={() => setShowSettings(true)}
@@ -344,13 +394,11 @@ export default function Page() {
                 title="Filter settings"
               >
                 <svg viewBox="0 0 80 100" className="w-12 h-16" xmlns="http://www.w3.org/2000/svg">
-                  {/* Baleen filter icon */}
                   <line x1="20" y1="30" x2="20" y2="80" stroke="#14b8a6" strokeWidth="2" opacity="0.8" />
                   <line x1="30" y1="30" x2="30" y2="82" stroke="#14b8a6" strokeWidth="2" opacity="0.8" />
                   <line x1="40" y1="30" x2="40" y2="85" stroke="#14b8a6" strokeWidth="2" opacity="0.8" />
                   <line x1="50" y1="30" x2="50" y2="85" stroke="#14b8a6" strokeWidth="2" opacity="0.8" />
                   <line x1="60" y1="30" x2="60" y2="82" stroke="#14b8a6" strokeWidth="2" opacity="0.8" />
-                  {/* Label */}
                   <text x="40" y="20" textAnchor="middle" className="text-[8px] fill-gray-300">
                     Filter
                   </text>
@@ -359,7 +407,7 @@ export default function Page() {
             </div>
           </div>
         ) : (
-          // EXPANDED SETTINGS VIEW - BALEEN WITH OPTIONS ON THE PLATES (ZOOMING IN)
+          // EXPANDED SETTINGS VIEW
           <div className="zoom-in w-full h-full flex flex-col items-center justify-center p-8 pointer-events-auto">
             <div className="max-w-2xl space-y-8">
               {/* Close button */}
@@ -372,10 +420,9 @@ export default function Page() {
                   ✕
                 </button>
               </div>
-              {/* LARGE BALEEN VISUAL WITH SETTINGS ON THE PLATES */}
+              {/* BALEEN VISUAL WITH SETTINGS */}
               <div className="flex justify-center mb-8">
                 <svg viewBox="0 0 400 500" className="w-96 h-full max-h-96" xmlns="http://www.w3.org/2000/svg">
-                  {/* Whale mouth opening */}
                   <path d="M 150 100 Q 200 120 250 100" stroke="#14b8a6" strokeWidth="2" fill="none" opacity="0.6" />
                   {/* BALEEN PLATE 1 - MUTE KEYWORDS */}
                   <g>
@@ -464,7 +511,7 @@ export default function Page() {
                     checked={deduplicate}
                     onChange={(e) => {
                       setDeduplicate(e.target.checked);
-                      fetchFeed();
+                      fetchFeed(aiFilterEnabled, aiSensitivity, aiWhitelist);
                     }}
                     className="w-5 h-5 accent-teal-500"
                   />
@@ -484,6 +531,7 @@ export default function Page() {
           </div>
         )}
       </div>
+
       {/* FEED */}
       <div 
         className="transition-opacity duration-[3000ms]"
@@ -494,6 +542,8 @@ export default function Page() {
         }}
       >
         <div className="water-shimmer" style={{ position: 'fixed', pointerEvents: 'none' }} />
+        
+        {/* Header */}
         <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-center relative z-10">
           <button
             onClick={() => setIsOpen(false)}
@@ -515,7 +565,21 @@ export default function Page() {
             <span className="text-sm font-semibold text-slate-900">Baleen</span>
           </button>
         </div>
+
         <div className="p-6 max-w-2xl mx-auto">
+          {/* AI SLOP FILTER PANEL */}
+          <div className="mb-8">
+            <AISlop FilterPanel 
+              onFilterChange={handleFilterChange}
+              initialSettings={{
+                enabled: aiFilterEnabled,
+                sensitivity: aiSensitivity,
+                whitelist: aiWhitelist,
+              }}
+            />
+          </div>
+
+          {/* FEED ITEMS */}
           {posts.length === 0 ? (
             <div className="text-center text-slate-500 py-12">
               <p>Loading your feed...</p>
@@ -530,6 +594,21 @@ export default function Page() {
                     : "bg-white border border-slate-200"
                 }`}
               >
+                {/* AI Score Badge (if available) */}
+                {post.aiScore !== undefined && post.aiScore > 0 && (
+                  <div className="mb-3 inline-block">
+                    <div className={`text-xs px-2 py-1 rounded-full font-semibold ${
+                      post.aiScore > 60 
+                        ? "bg-red-100 text-red-700" 
+                        : post.aiScore > 30 
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-green-100 text-green-700"
+                    }`}>
+                      🤖 AI Score: {post.aiScore}
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-slate-900">{post.author}</span>
