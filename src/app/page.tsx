@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import AISlop FilterPanel from "./components/AISlopFilterPanel";
+import AISlopFilterPanel from "./components/AISlopFilterPanel";
 
 export default function Page() {
   const [posts, setPosts] = useState<any[]>([]);
