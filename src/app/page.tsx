@@ -182,7 +182,11 @@ export default function Page() {
     fetchFeed();
   }, []);
 
-  const fetchFeed = async (filterAI?: boolean, sensitivity?: number, whitelist?: string[]) => {
+  const fetchFeed = async (
+    filterAI?: boolean,
+    sensitivity?: number,
+    whitelist?: string[]
+  ) => {
     try {
       const params = new URLSearchParams();
       if (deduplicate) params.append("deduplicate", "true");
@@ -296,27 +300,92 @@ export default function Page() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between z-10">
-        <span className="text-sm font-semibold text-slate-900">Baleen</span>
-        <button className="text-slate-500 hover:text-slate-700 text-lg">⚙️</button>
+    <div 
+      className="min-h-screen transition-colors duration-[10000ms]"
+      style={{
+        backgroundColor: isOpen ? '#f8fafc' : '#0f172a',
+        transitionTimingFunction: 'linear'
+      }}
+    >
+      <style>{`
+        @keyframes whaleRise { 0% { transform: translateY(200px); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateY(0); opacity: 0; } }
+        @keyframes krillFloat { 0% { opacity: 0; transform: translateY(0); } 20% { opacity: 1; } 80% { opacity: 1; } 100% { opacity: 0; transform: translateY(-100px); } }
+        @keyframes logoGlow { 0% { opacity: 0; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(1.2); } }
+        .whale-animation { animation: whaleRise 5s linear forwards; }
+        .krill { animation: krillFloat 5s linear forwards; }
+        .logo-glow { animation: logoGlow 3s linear forwards; animation-delay: 2s; }
+      `}</style>
+
+      {/* WHALE EMERGENCE ANIMATION */}
+      <div 
+        className="fixed inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center overflow-hidden transition-opacity duration-[3000ms]"
+        style={{ opacity: showAnimation ? '1' : '0', pointerEvents: 'none' }}
+      >
+        {[...Array(12)].map((_, i) => (
+          <div key={`krill-${i}`} className="krill absolute" style={{ left: `${20 + i * 7}%`, top: `${40 + (i % 3) * 15}%`, animationDelay: `${0.1 + i * 0.15}s` }}>
+            <svg viewBox="0 0 20 20" className="w-2 h-2"><ellipse cx="10" cy="10" rx="5" ry="3" fill="#14b8a6" opacity="0.8" /></svg>
+          </div>
+        ))}
+        <div className="whale-animation"><svg viewBox="0 0 300 200" className="w-80 h-auto"><ellipse cx="150" cy="100" rx="90" ry="45" fill="#1e3a4c" opacity="0.9" /></svg></div>
       </div>
-      <div className="p-6 max-w-2xl mx-auto">
-        {posts.length === 0 ? (
-          <div className="text-center text-slate-500 py-12">Loading...</div>
+
+      {/* SPLASH SCREEN */}
+      <div 
+        className="fixed inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex flex-col items-center justify-center pointer-events-none transition-opacity duration-[3000ms]"
+        style={{ opacity: (showAnimation || isOpen) ? '0' : '1', pointerEvents: isOpen ? 'none' : 'auto' }}
+      >
+        {!showSettings ? (
+          <div className="text-center space-y-8 max-w-sm pointer-events-auto">
+            <button onClick={() => setIsOpen(true)} className="flex justify-center hover:opacity-80 transition-opacity">
+              <svg viewBox="0 0 120 120" className="w-24 h-24"><circle cx="60" cy="45" r="3" fill="#14b8a6" opacity="0.8" /></svg>
+            </button>
+            <h1 className="text-5xl font-light tracking-widest text-white">BALEEN</h1>
+            <p className="text-lg text-gray-300 font-light">Social, without the noise.</p>
+            <button onClick={() => setShowSettings(true)} className="flex justify-center items-center hover:opacity-70 transition-opacity">
+              <svg viewBox="0 0 80 100" className="w-12 h-16"><line x1="20" y1="30" x2="20" y2="80" stroke="#14b8a6" strokeWidth="2" opacity="0.8" /></svg>
+            </button>
+          </div>
         ) : (
-          posts.map((post: any) => (
-            <PostItem
-              key={post.id}
-              post={post}
-              likedPosts={likedPosts}
-              repostedPosts={repostedPosts}
-              loadingActions={loadingActions}
-              onLike={handleLike}
-              onRepost={handleRepost}
-            />
-          ))
+          <div className="w-full h-full flex flex-col items-center justify-center p-8 pointer-events-auto overflow-y-auto">
+            <div className="max-w-3xl space-y-8 py-8">
+              <div className="flex justify-end">
+                <button onClick={() => setShowSettings(false)} className="text-white hover:opacity-70 text-2xl">✕</button>
+              </div>
+              <div className="space-y-6 bg-slate-800 bg-opacity-50 p-6 rounded-lg">
+                <label className="flex items-center gap-3 cursor-pointer text-white">
+                  <input type="checkbox" checked={deduplicate} onChange={(e) => { setDeduplicate(e.target.checked); fetchFeed(aiFilterEnabled, aiSensitivity, aiWhitelist); }} className="w-5 h-5 accent-teal-500" />
+                  <span className="text-sm">Hide duplicate posts (24h window)</span>
+                </label>
+                <div className="border-t border-slate-600 pt-4">
+                  <label className="flex items-center gap-3 cursor-pointer text-white">
+                    <input type="checkbox" checked={aiFilterEnabled} onChange={(e) => { setAiFilterEnabled(e.target.checked); fetchFeed(e.target.checked, aiSensitivity, aiWhitelist); }} className="w-5 h-5 accent-teal-500" />
+                    <span className="text-sm font-semibold">🐋 Filter AI Slop</span>
+                  </label>
+                </div>
+              </div>
+              <button onClick={() => { setShowSettings(false); setIsOpen(true); }} className="w-full px-12 py-3 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition-colors text-base font-semibold">Enter Feed</button>
+            </div>
+          </div>
         )}
+      </div>
+
+      {/* FEED */}
+      <div style={{ opacity: isOpen ? '1' : '0', transitionTimingFunction: 'linear', pointerEvents: isOpen ? 'auto' : 'none' }} className="transition-opacity duration-[3000ms]">
+        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between relative z-10">
+          <button onClick={() => setIsOpen(false)} className="flex items-center gap-2 hover:opacity-70 transition-opacity">
+            <span className="text-sm font-semibold text-slate-900">Baleen</span>
+          </button>
+          <button onClick={() => setShowSettings(true)} className="text-slate-500 hover:text-slate-700 transition text-lg">⚙️</button>
+        </div>
+        <div className="p-6 max-w-2xl mx-auto">
+          {posts.length === 0 ? (
+            <div className="text-center text-slate-500 py-12">Loading your feed...</div>
+          ) : (
+            posts.map((post: any) => (
+              <PostItem key={post.id} post={post} likedPosts={likedPosts} repostedPosts={repostedPosts} loadingActions={loadingActions} onLike={handleLike} onRepost={handleRepost} />
+            ))
+          )}
+        </div>
       </div>
     </div>
   );
