@@ -87,24 +87,24 @@ export function ReplyInput({
         }
 
         .reply-input-wrapper {
-          background: rgba(0, 30, 60, 0.4);
-          border: 1px solid rgba(100, 200, 255, 0.3);
+          background: #f9fafb;
+          border: 1px solid #d1d5db;
           border-radius: 6px;
           padding: 1rem;
           transition: all 0.2s ease;
         }
 
         .reply-input-wrapper:focus-within {
-          background: rgba(0, 30, 60, 0.6);
-          border-color: rgba(100, 200, 255, 0.6);
-          box-shadow: 0 0 12px rgba(100, 200, 255, 0.15);
+          background: #ffffff;
+          border-color: #0d9488;
+          box-shadow: 0 0 12px rgba(13, 148, 136, 0.15);
         }
 
         .reply-textarea {
           width: 100%;
           background: transparent;
           border: none;
-          color: #ffffff;
+          color: #1f2937;
           font-family: "DM Mono", monospace;
           font-size: 0.95rem;
           resize: none;
@@ -113,7 +113,7 @@ export function ReplyInput({
         }
 
         .reply-textarea::placeholder {
-          color: rgba(192, 192, 192, 0.5);
+          color: rgba(107, 114, 128, 0.6);
         }
 
         .reply-textarea:disabled {
@@ -127,18 +127,18 @@ export function ReplyInput({
           align-items: center;
           margin-top: 0.75rem;
           padding-top: 0.75rem;
-          border-top: 1px solid rgba(100, 200, 255, 0.15);
+          border-top: 1px solid #e5e7eb;
         }
 
         .char-count {
           font-family: "DM Mono", monospace;
           font-size: 0.8rem;
-          color: #888;
+          color: #6b7280;
         }
 
         .reply-submit-btn {
-          background: linear-gradient(135deg, #0099ff, #00ccff);
-          color: #001a33;
+          background: linear-gradient(135deg, #0d9488, #14b8a6);
+          color: #ffffff;
           border: none;
           padding: 0.5rem 1.25rem;
           border-radius: 4px;
@@ -148,12 +148,12 @@ export function ReplyInput({
           letter-spacing: 0.5px;
           cursor: pointer;
           transition: all 0.2s ease;
-          box-shadow: 0 4px 12px rgba(0, 153, 255, 0.2);
+          box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
         }
 
         .reply-submit-btn:hover:not(:disabled) {
           transform: translateY(-2px);
-          box-shadow: 0 6px 16px rgba(0, 153, 255, 0.4);
+          box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
         }
 
         .reply-submit-btn:active:not(:disabled) {
@@ -166,13 +166,13 @@ export function ReplyInput({
         }
 
         .reply-error {
-          color: #ff6b6b;
+          color: #dc2626;
           font-family: "DM Mono", monospace;
           font-size: 0.85rem;
           margin-top: 0.5rem;
           padding: 0.5rem 1rem;
-          background: rgba(255, 107, 107, 0.1);
-          border-left: 2px solid #ff6b6b;
+          background: rgba(220, 38, 38, 0.1);
+          border-left: 2px solid #dc2626;
           border-radius: 2px;
         }
       `}</style>

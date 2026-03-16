@@ -84,7 +84,7 @@ export function CommentsSection({
         .comments-section {
           margin-top: 1rem;
           padding: 1rem 0;
-          border-top: 1px solid rgba(100, 200, 255, 0.2);
+          border-top: 1px solid #e5e7eb;
           animation: fadeIn 0.3s ease-in;
         }
 
@@ -109,7 +109,7 @@ export function CommentsSection({
         .comments-header h3 {
           font-family: "Cormorant Garamond", serif;
           font-size: 1.2rem;
-          color: #64c8ff;
+          color: #0d9488;
           margin: 0;
           font-weight: 600;
           letter-spacing: 0.5px;
@@ -120,8 +120,8 @@ export function CommentsSection({
           height: 1px;
           background: linear-gradient(
             90deg,
-            rgba(100, 200, 255, 0.3),
-            rgba(100, 200, 255, 0)
+            #0d9488,
+            transparent
           );
         }
 
@@ -133,15 +133,15 @@ export function CommentsSection({
 
         .comment-item {
           padding: 0.75rem;
-          background: rgba(0, 30, 60, 0.3);
-          border-left: 2px solid rgba(100, 200, 255, 0.4);
+          background: #f3f4f6;
+          border-left: 2px solid #14b8a6;
           border-radius: 4px;
           transition: all 0.2s ease;
         }
 
         .comment-item:hover {
-          background: rgba(0, 30, 60, 0.5);
-          border-left-color: rgba(100, 200, 255, 0.8);
+          background: #e5e7eb;
+          border-left-color: #0d9488;
         }
 
         .comment-author-line {
@@ -155,24 +155,24 @@ export function CommentsSection({
         .comment-author {
           font-family: "Cormorant Garamond", serif;
           font-weight: 600;
-          color: #ffffff;
+          color: #1f2937;
         }
 
         .comment-handle {
           font-family: "DM Mono", monospace;
-          color: #64c8ff;
+          color: #0d9488;
           font-size: 0.85rem;
         }
 
         .comment-time {
           font-family: "DM Mono", monospace;
-          color: #888;
+          color: #6b7280;
           font-size: 0.8rem;
           margin-left: auto;
         }
 
         .comment-text {
-          color: #c0c0c0;
+          color: #374151;
           margin: 0.5rem 0 0;
           line-height: 1.5;
           font-size: 0.95rem;
@@ -182,7 +182,7 @@ export function CommentsSection({
           margin-top: 0.5rem;
           font-family: "DM Mono", monospace;
           font-size: 0.85rem;
-          color: #888;
+          color: #6b7280;
         }
 
         .like-count {
@@ -199,9 +199,9 @@ export function CommentsSection({
         .comments-section-empty {
           padding: 1.5rem;
           text-align: center;
-          color: #888;
+          color: #6b7280;
           font-family: "Cormorant Garamond", serif;
-          border-top: 1px solid rgba(100, 200, 255, 0.2);
+          border-top: 1px solid #e5e7eb;
           margin-top: 1rem;
         }
 
@@ -215,8 +215,8 @@ export function CommentsSection({
         .spinner {
           width: 24px;
           height: 24px;
-          border: 2px solid rgba(100, 200, 255, 0.2);
-          border-top: 2px solid #64c8ff;
+          border: 2px solid #e5e7eb;
+          border-top: 2px solid #0d9488;
           border-radius: 50%;
           animation: spin 0.8s linear infinite;
         }
@@ -228,7 +228,7 @@ export function CommentsSection({
         }
 
         .comments-section-error {
-          color: #ff6b6b;
+          color: #dc2626;
         }
 
         .comments-section-empty {
