@@ -43,19 +43,62 @@ export default function FeedsPage() {
   };
 
   return (
-    <div className="w-full h-full flex gap-10 p-15 items-center justify-between overflow-hidden">
-      {/* Left panel: Social media icons grid */}
-      <div className="flex-shrink-0 flex items-center justify-center h-full">
-        <div className="grid grid-cols-2 gap-5" style={{ width: '200px' }}>
+    <div className="w-full h-full flex relative overflow-hidden" style={{ gap: '40px', padding: '60px 40px' }}>
+      {/* Left panel: Social media icons */}
+      <div style={{
+        flex: '0 0 auto',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+      }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(2, 1fr)',
+          gap: '20px',
+          width: '200px',
+        }}>
           {feedSources.map((source) => (
             <div
               key={source.id}
-              className="flex flex-col items-center gap-2 p-4 bg-cyan-400 bg-opacity-5 border border-cyan-400 border-opacity-30 rounded hover:bg-opacity-15 hover:border-opacity-60 transition-all cursor-grab active:cursor-grabbing hover:scale-105"
               draggable
               onDragStart={(e) => handleDragStart(e, source.id)}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '16px',
+                background: 'rgba(0, 217, 255, 0.05)',
+                border: '1px solid rgba(0, 217, 255, 0.3)',
+                borderRadius: '8px',
+                cursor: 'grab',
+                transition: 'all 0.3s ease-in-out',
+                userSelect: 'none',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 217, 255, 0.15)';
+                e.currentTarget.style.borderColor = 'rgba(0, 217, 255, 0.6)';
+                e.currentTarget.style.transform = 'scale(1.05)';
+                e.currentTarget.style.boxShadow = '0 0 20px rgba(0, 217, 255, 0.3)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(0, 217, 255, 0.05)';
+                e.currentTarget.style.borderColor = 'rgba(0, 217, 255, 0.3)';
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.boxShadow = 'none';
+              }}
             >
-              <div className="text-3xl leading-none">{source.emoji}</div>
-              <div className="text-xs font-bold text-cyan-400 text-opacity-80 uppercase tracking-tighter text-center leading-tight">
+              <div style={{ fontSize: '32px', lineHeight: '1' }}>{source.emoji}</div>
+              <div style={{
+                fontSize: '11px',
+                fontWeight: 700,
+                color: 'rgba(0, 217, 255, 0.8)',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                textAlign: 'center',
+                lineHeight: '1.2',
+              }}>
                 {source.label}
               </div>
             </div>
@@ -63,10 +106,25 @@ export default function FeedsPage() {
         </div>
       </div>
 
-      {/* Right panel: Whale illustration with drop zone */}
-      <div className="flex-1 flex items-center justify-center relative h-full max-w-xl">
+      {/* Right panel: Whale with drop zone */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        position: 'relative',
+        height: '100%',
+        maxWidth: '500px',
+      }}>
         {/* Whale image container */}
-        <div className="w-full h-full flex items-center justify-center relative">
+        <div style={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+        }}>
           <Image
             src="/images/whale.jpg"
             alt="whale drop zone"
@@ -82,47 +140,59 @@ export default function FeedsPage() {
           />
         </div>
 
-        {/* Drop zone positioned at whale's mouth */}
+        {/* Drop zone at whale mouth */}
         <div
-          className={`absolute transition-all rounded-2xl flex flex-col items-center justify-center gap-2 cursor-pointer ${
-            dragOver
-              ? 'border-2 border-cyan-400 border-opacity-95 bg-cyan-400 bg-opacity-25'
-              : 'border-2 border-dashed border-cyan-400 border-opacity-40 bg-cyan-400 bg-opacity-5 hover:bg-opacity-10 hover:border-opacity-60'
-          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
           style={{
+            position: 'absolute',
             bottom: '80px',
             left: '50%',
             transform: 'translateX(-50%)',
             width: '150px',
             height: '100px',
+            border: dragOver ? '2px solid rgba(0, 217, 255, 0.95)' : '2px dashed rgba(0, 217, 255, 0.4)',
+            borderRadius: '12px',
+            background: dragOver ? 'rgba(0, 217, 255, 0.25)' : 'rgba(0, 217, 255, 0.05)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '8px',
+            transition: 'all 0.3s ease-in-out',
+            cursor: 'pointer',
+            boxShadow: dragOver ? '0 0 30px rgba(0, 217, 255, 0.8), inset 0 0 20px rgba(0, 217, 255, 0.3)' : 'none',
           }}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
         >
-          {dragOver && (
-            <style>{`
-              @keyframes dropZoneGlow {
-                0%, 100% { box-shadow: 0 0 30px rgba(0, 217, 255, 0.8), inset 0 0 20px rgba(0, 217, 255, 0.3); }
-                50% { box-shadow: 0 0 40px rgba(0, 217, 255, 1), inset 0 0 30px rgba(0, 217, 255, 0.5); }
-              }
-            `}</style>
-          )}
-          
-          <div className="text-center text-xs leading-tight font-bold text-cyan-400 text-opacity-70 uppercase tracking-wider">
+          <div style={{
+            textAlign: 'center',
+            fontSize: '9px',
+            lineHeight: '1.2',
+            fontWeight: 700,
+            color: 'rgba(0, 217, 255, 0.7)',
+            textTransform: 'uppercase',
+            letterSpacing: '1px',
+          }}>
             DROP FEED
           </div>
 
           {connectedFeeds.length > 0 && (
-            <div className="flex gap-2 flex-wrap justify-center w-full">
+            <div style={{
+              display: 'flex',
+              gap: '8px',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
+              width: '100%',
+            }}>
               {connectedFeeds.map((feed) => {
                 const source = feedSources.find((s) => s.id === feed);
                 return source ? (
                   <div
                     key={feed}
-                    className="text-xl"
                     style={{
-                      animation: 'popIn 0.3s ease-out',
+                      fontSize: '20px',
+                      animation: 'pop-in 0.3s ease-out',
                     }}
                   >
                     {source.emoji}
@@ -134,20 +204,11 @@ export default function FeedsPage() {
         </div>
       </div>
 
-      {/* Animations */}
       <style>{`
-        @keyframes popIn {
-          0% {
-            transform: scale(0);
-            opacity: 0;
-          }
-          50% {
-            transform: scale(1.2);
-          }
-          100% {
-            transform: scale(1);
-            opacity: 1;
-          }
+        @keyframes pop-in {
+          0% { transform: scale(0); opacity: 0; }
+          50% { transform: scale(1.2); }
+          100% { transform: scale(1); opacity: 1; }
         }
       `}</style>
     </div>

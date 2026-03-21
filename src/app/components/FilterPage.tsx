@@ -14,14 +14,13 @@ export default function FilterPage({ barValues, onUpdateBar }: FilterPageProps) 
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const filterBarText = target.closest('[data-bar-text]');
-      
-      if (filterBarText) {
-        const barElement = filterBarText.closest('[data-bar]');
-        if (barElement) {
+      if (target.getAttribute('data-bar-text')) {
+        const barDiv = target.closest('[data-bar-index]');
+        if (barDiv) {
+          const barIndex = parseInt(barDiv.getAttribute('data-bar-index') || '0');
           dragStateRef.current.active = true;
-          dragStateRef.current.bar = parseInt(barElement.getAttribute('data-bar') || '0');
-          dragStateRef.current.barRect = barElement.getBoundingClientRect();
+          dragStateRef.current.bar = barIndex;
+          dragStateRef.current.barRect = barDiv.getBoundingClientRect();
           e.preventDefault();
         }
       }
@@ -56,24 +55,28 @@ export default function FilterPage({ barValues, onUpdateBar }: FilterPageProps) 
   }, [onUpdateBar]);
 
   return (
-    <div className="w-full h-full flex items-center justify-center relative">
+    <div className="w-full h-full relative flex items-center justify-center">
       {/* Filter wall grid */}
-      <div className="grid gap-5 h-4/5 max-h-96 items-center justify-center"
-        style={{
-          gridTemplateColumns: 'auto 60px 60px 60px 60px 60px 60px auto'
-        }}
-      >
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'auto 60px 60px 60px 60px 60px 60px auto',
+        gap: '20px',
+        height: '80%',
+        maxHeight: '520px',
+        position: 'relative',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
         {/* Left decorative side */}
-        <div className="flex flex-col gap-3 opacity-35">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', opacity: 0 }}>
           {[0, 1, 2].map((i) => (
             <div
-              key={i}
-              className="w-0.5 h-44"
+              key={`left-${i}`}
               style={{
+                width: '1.5px',
+                height: '180px',
                 background: 'linear-gradient(180deg, transparent, #00d9ff 25%, #0099ff 50%, #00d9ff 75%, transparent)',
                 boxShadow: '0 0 8px rgba(0, 217, 255, 0.4)',
-                animation: `pulseMini 2.5s infinite`,
-                animationDelay: `${i * 0.3}s`,
               }}
             />
           ))}
@@ -83,35 +86,80 @@ export default function FilterPage({ barValues, onUpdateBar }: FilterPageProps) 
         {barLabels.map((label, index) => (
           <div
             key={index}
-            className="h-full w-full flex items-center justify-center relative"
-            data-bar={index}
+            data-bar-index={index}
+            style={{
+              height: '100%',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              position: 'relative',
+            }}
           >
-            <div className="h-96 w-8 relative">
-              {/* Outline */}
-              <div className="absolute inset-0 border-2 border-cyan-400 border-opacity-60 rounded-lg bg-cyan-400 bg-opacity-5" />
-              
-              {/* Fill */}
+            <div
+              style={{
+                height: '420px',
+                width: '30px',
+                position: 'relative',
+              }}
+            >
+              {/* Bar outline */}
               <div
-                className="absolute bottom-0 left-0 right-0 rounded-md transition-all"
                 style={{
-                  height: `${barValues[index]}%`,
-                  background: `linear-gradient(180deg, rgba(0, 217, 255, ${(barValues[index] / 100) * 0.8}), rgba(0, 217, 255, ${(barValues[index] / 100) * 0.2}))`,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  border: '2px solid rgba(0, 217, 255, 0.6)',
+                  borderRadius: '8px',
+                  background: 'rgba(0, 217, 255, 0.05)',
+                  boxSizing: 'border-box',
                 }}
               />
-              
-              {/* Text label */}
+
+              {/* Bar fill */}
               <div
-                className="absolute left-1/2 w-full h-8 flex items-center justify-center font-bold text-xs text-white text-opacity-95 cursor-grab active:cursor-grabbing select-none z-10 transition-all"
+                style={{
+                  position: 'absolute',
+                  bottom: 0,
+                  left: 0,
+                  width: '100%',
+                  height: `${barValues[index]}%`,
+                  background: `linear-gradient(180deg, rgba(0, 217, 255, ${(barValues[index] / 100) * 0.8}), rgba(0, 217, 255, ${(barValues[index] / 100) * 0.2}))`,
+                  borderRadius: '6px',
+                  transition: 'height 0.05s ease-out, background 0.05s ease-out',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              {/* Bar label */}
+              <div
                 data-bar-text
                 style={{
-                  transform: `translateX(-50%) rotate(180deg)`,
-                  top: `${100 - barValues[index]}%`,
+                  position: 'absolute',
+                  width: '100%',
+                  height: '30px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontFamily: 'Arial, sans-serif',
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  color: 'rgba(255, 255, 255, 0.95)',
+                  textShadow: '0 0 10px rgba(0, 217, 255, 0.8)',
                   writingMode: 'vertical-rl',
                   textOrientation: 'mixed',
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase',
                   lineHeight: '1.1',
-                  textShadow: '0 0 10px rgba(0, 217, 255, 0.8)',
+                  transform: 'translateX(-50%) rotate(180deg)',
+                  cursor: 'grab',
+                  userSelect: 'none',
+                  zIndex: 10,
+                  left: '50%',
+                  top: `${100 - barValues[index]}%`,
+                  transition: 'top 0.05s ease-out',
                 }}
               >
                 {label}
@@ -121,29 +169,20 @@ export default function FilterPage({ barValues, onUpdateBar }: FilterPageProps) 
         ))}
 
         {/* Right decorative side */}
-        <div className="flex flex-col gap-3 opacity-35">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', opacity: 0 }}>
           {[0, 1, 2].map((i) => (
             <div
-              key={i}
-              className="w-0.5 h-44"
+              key={`right-${i}`}
               style={{
+                width: '1.5px',
+                height: '180px',
                 background: 'linear-gradient(180deg, transparent, #00d9ff 25%, #0099ff 50%, #00d9ff 75%, transparent)',
                 boxShadow: '0 0 8px rgba(0, 217, 255, 0.4)',
-                animation: `pulseMini 2.5s infinite`,
-                animationDelay: `${i * 0.3}s`,
               }}
             />
           ))}
         </div>
       </div>
-
-      {/* Animations */}
-      <style>{`
-        @keyframes pulseMini {
-          0%, 100% { opacity: 0.35; box-shadow: 0 0 8px rgba(0, 217, 255, 0.4); }
-          50% { opacity: 0.6; box-shadow: 0 0 14px rgba(0, 217, 255, 0.7); }
-        }
-      `}</style>
     </div>
   );
 }
