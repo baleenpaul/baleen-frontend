@@ -48,7 +48,11 @@ export default function InteractivePage() {
       const response = await fetch('https://baleen-backend.onrender.com/feed');
       const data = await response.json();
       if (data.items) {
-        setFeed(data.items);
+        // Sort by timestamp descending (newest first) to intersperse feeds
+        const sorted = data.items.sort((a: FeedItem, b: FeedItem) => {
+          return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        });
+        setFeed(sorted);
       }
     } catch (error) {
       console.error('Failed to fetch feed:', error);
@@ -942,8 +946,13 @@ export default function InteractivePage() {
                         key={idx}
                         src={img}
                         alt="Post image"
+                        className="feed-post-image"
                         onError={(e) => {
+                          console.warn(`Image failed to load: ${img} (${post.platform})`);
                           (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                        onLoad={() => {
+                          console.log(`Image loaded: ${post.platform}`);
                         }}
                       />
                     ))}
