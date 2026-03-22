@@ -369,8 +369,8 @@ export default function InteractivePage() {
         }
 
         .feed-post-avatar {
-          width: 48px;
-          height: 48px;
+          width: 36px;
+          height: 36px;
           border-radius: 50%;
           display: flex;
           align-items: center;
@@ -378,6 +378,7 @@ export default function InteractivePage() {
           font-weight: bold;
           border: 2px solid currentColor;
           flex-shrink: 0;
+          font-size: 14px;
         }
 
         .feed-post-info {
@@ -752,14 +753,14 @@ export default function InteractivePage() {
           flex-direction: column;
           align-items: center;
           gap: 8px;
-          padding: 16px;
+          padding: 20px;
           background: radial-gradient(circle at 30% 30%, rgba(0, 217, 255, 0.3), rgba(0, 217, 255, 0.05));
           border: 1px solid rgba(0, 217, 255, 0.4);
           border-radius: 50%;
           cursor: grab;
           user-select: none;
-          width: 80px;
-          height: 80px;
+          width: 100px;
+          height: 100px;
           justify-content: center;
           box-shadow: 0 0 25px rgba(0, 217, 255, 0.2), inset -10px -10px 20px rgba(0, 0, 0, 0.3), inset 5px 5px 15px rgba(0, 217, 255, 0.1);
           animation: float-icon 4s ease-in-out infinite;
@@ -779,12 +780,12 @@ export default function InteractivePage() {
         }
 
         .feeds-icon-emoji {
-          font-size: 32px;
+          font-size: 40px;
           line-height: 1;
         }
 
         .feeds-icon-label {
-          font-size: 11px;
+          font-size: 12px;
           font-weight: 700;
           color: rgba(0, 217, 255, 0.8);
           text-transform: uppercase;
