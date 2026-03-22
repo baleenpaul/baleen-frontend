@@ -336,10 +336,16 @@ export default function InteractivePage() {
           font-size: 24px;
           font-weight: 700;
           cursor: pointer;
-          opacity: 1;
-          pointer-events: all;
+          opacity: 0;
+          pointer-events: none;
           box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
           animation: float-feeds 6s ease-in-out infinite;
+        }
+
+        /* Bubbles only visible on splash page */
+        .interactive-container:not(.filter-mode):not(.feed-mode) .bubble {
+          opacity: 1;
+          pointer-events: all;
         }
 
         /* Bubbles aligned with FILTER grid columns - F I L T E R */
@@ -357,8 +363,6 @@ export default function InteractivePage() {
           100% { transform: translateY(calc(-50% + 120px)); opacity: 0; }
         }
 
-        .filter-mode .bubble { opacity: 0; pointer-events: none; }
-        .feed-mode .bubble { opacity: 0; pointer-events: none; }
         .feed-mode .filter-wall { opacity: 0; pointer-events: none; visibility: hidden; }
 
         .feeds-page {
