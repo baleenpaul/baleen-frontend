@@ -3,11 +3,78 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 
+interface FeedItem {
+  id: string;
+  platform: 'bluesky' | 'mastodon';
+  author: string;
+  authorHandle: string;
+  text: string;
+  timestamp: string;
+  likeCount: number;
+  repostCount: number;
+  replyCount: number;
+  images: string[];
+}
+
 export default function InteractivePage() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState<'landing' | 'feed' | 'control'>('landing');
   const [currentMode, setCurrentMode] = useState('splash');
   const [barValues, setBarValues] = useState([50, 50, 50, 50, 50, 50]);
+  const [feed, setFeed] = useState<FeedItem[]>([]);
+  const [feedLoading, setFeedLoading] = useState(true);
   const dragStateRef = useRef({ active: false, bar: null as number | null, barRect: null as DOMRect | null });
+
+  // Landing page: show for 5 seconds then transition to feed
+  useEffect(() => {
+    if (page === 'landing') {
+      const timer = setTimeout(() => {
+        setPage('feed');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [page]);
+
+  // Fetch feed data
+  useEffect(() => {
+    if (page === 'feed') {
+      fetchFeed();
+    }
+  }, [page]);
+
+  const fetchFeed = async () => {
+    try {
+      setFeedLoading(true);
+      const response = await fetch('https://baleen-backend.onrender.com/feed');
+      const data = await response.json();
+      if (data.items) {
+        setFeed(data.items);
+      }
+    } catch (error) {
+      console.error('Failed to fetch feed:', error);
+    } finally {
+      setFeedLoading(false);
+    }
+  };
+
+  const formatDate = (isoString: string) => {
+    const date = new Date(isoString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return 'now';
+    if (minutes < 60) return `${minutes}m`;
+    if (hours < 24) return `${hours}h`;
+    if (days < 7) return `${days}d`;
+    return date.toLocaleDateString();
+  };
+
+  const platformColor = (platform: string) => {
+    return platform === 'bluesky' ? '#1185FE' : '#6364FF';
+  };
 
   const goToFilterPage = () => {
     if (currentMode === 'splash') {
@@ -27,7 +94,6 @@ export default function InteractivePage() {
   };
 
   useEffect(() => {
-    // Initialize bars with default values
     barValues.forEach((value, index) => {
       updateBar(index, value);
     });
@@ -120,9 +186,276 @@ export default function InteractivePage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-5">
+    <div className="min-h-screen bg-black text-white">
       <style>{`
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        /* Landing Page */
+        .landing-page {
+          position: fixed;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          z-50;
+          background: linear-gradient(to br, #0f0f1e, #000000, #1a0f2e);
+          animation: landingFadeOut 1s ease-in 4s forwards;
+        }
+
+        @keyframes landingFadeOut {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
+        }
+
+        @keyframes fadeInScale {
+          0% { opacity: 0; transform: scale(0.8); }
+          100% { opacity: 1; transform: scale(1); }
+        }
+
+        .landing-whale {
+          animation: fadeInScale 0.8s ease-out;
+          width: 200px;
+          height: 200px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+
+        .landing-logo {
+          animation: fadeInScale 0.8s ease-out 0.2s both;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(to br, #14b8a6, #06b6d4);
+          border-radius: 20px;
+          box-shadow: 0 0 40px rgba(0, 217, 255, 0.5);
+          margin-bottom: 20px;
+        }
+
+        .landing-logo-text {
+          font-size: 32px;
+          font-weight: 900;
+          color: #000;
+        }
+
+        .landing-text {
+          animation: fadeInScale 0.8s ease-out 0.4s both;
+          font-size: 28px;
+          font-weight: 700;
+          letter-spacing: 3px;
+          text-transform: uppercase;
+          background: linear-gradient(135deg, #00d9ff 0%, #0099ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin-bottom: 12px;
+        }
+
+        .landing-tagline {
+          animation: fadeInScale 0.8s ease-out 0.6s both;
+          font-size: 14px;
+          font-weight: 400;
+          letter-spacing: 1px;
+          color: rgba(0, 217, 255, 0.6);
+          text-transform: uppercase;
+          text-align: center;
+        }
+
+        /* Live Feed */
+        .live-feed {
+          max-width: 600px;
+          margin: 0 auto;
+        }
+
+        .feed-header {
+          position: sticky;
+          top: 0;
+          z-index: 30;
+          background: linear-gradient(to bottom, rgba(0,0,0,1), rgba(0,0,0,0.8));
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+          padding: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+        }
+
+        .feed-header-logo {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          cursor: pointer;
+          transition: opacity 0.3s;
+        }
+
+        .feed-header-logo:hover {
+          opacity: 0.8;
+        }
+
+        .feed-header-logo-box {
+          width: 40px;
+          height: 40px;
+          background: linear-gradient(to br, #14b8a6, #06b6d4);
+          border-radius: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+          font-weight: 900;
+          font-size: 14px;
+          color: #000;
+        }
+
+        .feed-header-text {
+          font-weight: bold;
+          font-size: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          background: linear-gradient(135deg, #00d9ff 0%, #0099ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        .feed-refresh {
+          padding: 8px 12px;
+          font-size: 11px;
+          text-transform: uppercase;
+          font-weight: 700;
+          color: rgba(0, 217, 255, 0.8);
+          border: 1px solid rgba(0, 217, 255, 0.3);
+          background: rgba(0, 217, 255, 0.05);
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s;
+        }
+
+        .feed-refresh:hover {
+          background: rgba(0, 217, 255, 0.1);
+          border-color: rgba(0, 217, 255, 0.6);
+        }
+
+        .feed-loading {
+          padding: 80px 20px;
+          text-align: center;
+          color: rgba(0, 217, 255, 0.6);
+        }
+
+        .feed-post {
+          border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+          padding: 16px;
+          transition: all 0.3s;
+          cursor: pointer;
+          border-left: 2px solid transparent;
+        }
+
+        .feed-post:hover {
+          background: rgba(0, 217, 255, 0.05);
+          border-left-color: rgba(0, 217, 255, 0.3);
+        }
+
+        .feed-post-header {
+          display: flex;
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+
+        .feed-post-avatar {
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          border: 2px solid currentColor;
+          flex-shrink: 0;
+        }
+
+        .feed-post-info {
+          flex: 1;
+        }
+
+        .feed-post-meta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+
+        .feed-post-author {
+          font-weight: bold;
+          color: white;
+        }
+
+        .feed-post-handle {
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .feed-post-time {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .feed-post-platform {
+          font-size: 10px;
+          padding: 4px 8px;
+          border-radius: 4px;
+          font-weight: bold;
+        }
+
+        .feed-post-text {
+          color: rgba(255, 255, 255, 0.95);
+          line-height: 1.5;
+          margin-bottom: 12px;
+          word-break: break-word;
+        }
+
+        .feed-post-images {
+          display: grid;
+          gap: 8px;
+          margin-bottom: 12px;
+        }
+
+        .feed-post-images.multi {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .feed-post-images img {
+          width: 100%;
+          max-height: 300px;
+          object-fit: cover;
+          border-radius: 8px;
+          background: rgba(0, 217, 255, 0.1);
+        }
+
+        .feed-post-stats {
+          display: flex;
+          gap: 24px;
+          font-size: 13px;
+          color: rgba(255, 255, 255, 0.5);
+        }
+
+        .feed-post-stats span:hover {
+          color: rgba(0, 217, 255, 0.8);
+        }
+
+        /* Control Panel */
+        .control-panel {
+          position: fixed;
+          inset: 0;
+          z-40;
+          background: linear-gradient(to br, #0a1f3a, #0f1a2a, #1a0f2e);
+          overflow-y: auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 20px;
+        }
 
         .interactive-container {
           width: 100%;
@@ -146,13 +479,21 @@ export default function InteractivePage() {
           align-items: center;
           gap: 12px;
           z-index: 100;
+          cursor: pointer;
+        }
+
+        .logo:hover {
+          opacity: 0.8;
         }
 
         .logo-text {
           font-family: Arial, sans-serif;
           font-size: 14px;
           font-weight: 700;
-          color: rgba(0, 217, 255, 0.7);
+          background: linear-gradient(135deg, #00d9ff 0%, #0099ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
@@ -241,12 +582,10 @@ export default function InteractivePage() {
           transition: all 0.6s ease-in-out;
           opacity: 1;
           pointer-events: all;
-          visibility: visible;
         }
 
         .letter-strand:hover { transform: scale(1.05); }
-        .filter-mode .letter-strand { opacity: 0; pointer-events: none; visibility: hidden; }
-        .feed-mode .letter-strand { opacity: 0; pointer-events: none; visibility: hidden; }
+        .filter-mode .letter-strand { opacity: 0; pointer-events: none; }
 
         .letter-strand:nth-of-type(1) { animation-delay: 0s; }
         .letter-strand:nth-of-type(2) { animation-delay: 0.3s; }
@@ -261,7 +600,6 @@ export default function InteractivePage() {
         }
 
         .letter-text {
-          font-family: Arial, sans-serif;
           font-size: 120px;
           font-weight: 700;
           color: #00d9ff;
@@ -304,7 +642,7 @@ export default function InteractivePage() {
           height: 0%;
           background: linear-gradient(180deg, rgba(0, 217, 255, 0.8), rgba(0, 217, 255, 0.2));
           border-radius: 6px;
-          transition: height 0.05s ease-out, background 0.05s ease-out;
+          transition: height 0.05s ease-out;
           pointer-events: none;
         }
 
@@ -315,7 +653,6 @@ export default function InteractivePage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: Arial, sans-serif;
           font-size: 11px;
           font-weight: 700;
           color: rgba(255, 255, 255, 0.95);
@@ -331,11 +668,9 @@ export default function InteractivePage() {
           z-index: 10;
           left: 50%;
           top: 50%;
-          transition: top 0.05s ease-out;
         }
 
         .filter-bar-text:active { cursor: grabbing; }
-        .feed-mode .filter-bar-text { display: none; }
 
         .bubble {
           position: absolute;
@@ -426,13 +761,6 @@ export default function InteractivePage() {
           animation: float-icon 4s ease-in-out infinite;
           transition: all 0.3s ease-in-out;
         }
-
-        .feeds-icon:nth-child(1) { animation-delay: 0s; }
-        .feeds-icon:nth-child(2) { animation-delay: 0.3s; }
-        .feeds-icon:nth-child(3) { animation-delay: 0.6s; }
-        .feeds-icon:nth-child(4) { animation-delay: 0.9s; }
-        .feeds-icon:nth-child(5) { animation-delay: 1.2s; }
-        .feeds-icon:nth-child(6) { animation-delay: 1.5s; }
 
         @keyframes float-icon {
           0%, 100% { transform: translateY(0); box-shadow: 0 0 25px rgba(0, 217, 255, 0.2), inset -10px -10px 20px rgba(0, 0, 0, 0.3), inset 5px 5px 15px rgba(0, 217, 255, 0.1); }
@@ -549,109 +877,199 @@ export default function InteractivePage() {
         .filter-mode .filter-label { opacity: 1; }
       `}</style>
 
-      <div 
-        ref={containerRef}
-        className={`interactive-container ${currentMode === 'filter' ? 'filter-mode' : ''} ${currentMode === 'feeds' ? 'feed-mode' : ''}`}
-      >
-        {/* Logo */}
-        <div className="logo">
-          <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <rect width="100" height="100" rx="16" fill="rgba(0,217,255,0.1)" stroke="rgba(0,217,255,0.3)" strokeWidth="1"/>
-            <g transform="translate(50,50)">
-              <line x1="-15" y1="-20" x2="-15" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-              <line x1="-8" y1="-20" x2="-8" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-              <line x1="-1" y1="-20" x2="-1" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-              <line x1="6" y1="-20" x2="6" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-              <line x1="13" y1="-20" x2="13" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-              <circle cx="-15" cy="-22" r="3" fill="rgba(0,217,255,0.8)"/>
-              <circle cx="-8" cy="-24" r="3" fill="rgba(0,217,255,0.7)"/>
-              <circle cx="-1" cy="-22" r="3" fill="rgba(0,217,255,0.7)"/>
-              <circle cx="6" cy="-25" r="3" fill="rgba(0,217,255,0.6)"/>
-              <circle cx="13" cy="-22" r="3" fill="rgba(0,217,255,0.8)"/>
-            </g>
-          </svg>
-          <div className="logo-text">Baleen</div>
+      {/* Landing Page */}
+      {page === 'landing' && (
+        <div className="landing-page">
+          <div className="landing-whale">
+            <Image
+              src="/images/whale.jpg"
+              alt="whale"
+              width={300}
+              height={300}
+              style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 40px rgba(0, 217, 255, 0.6))' }}
+              priority
+            />
+          </div>
+          <div className="landing-logo">
+            <div className="landing-logo-text">IIB</div>
+          </div>
+          <div className="landing-text">Baleen</div>
+          <div className="landing-tagline">Unified Feed, without the noise</div>
         </div>
+      )}
 
-        {/* Back button */}
-        {currentMode !== 'splash' && (
-          <button className="back-button" onClick={goToSplash}>← Back</button>
-        )}
+      {/* Live Feed */}
+      {page === 'feed' && (
+        <div className="live-feed">
+          <div className="feed-header">
+            <div className="feed-header-logo" onClick={() => setPage('control')}>
+              <div className="feed-header-logo-box">IIB</div>
+              <div className="feed-header-text">Baleen</div>
+            </div>
+            <button className="feed-refresh" onClick={() => fetchFeed()}>Refresh</button>
+          </div>
 
-        <div className="filter-label">Filter Controls</div>
-        <div className="feeds-label">Feed Sources</div>
+          {feedLoading ? (
+            <div className="feed-loading">Loading feed...</div>
+          ) : (
+            feed.map((post) => (
+              <div key={post.id} className="feed-post">
+                <div className="feed-post-header">
+                  <div className="feed-post-avatar" style={{ color: platformColor(post.platform) }}>
+                    {post.author.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="feed-post-info">
+                    <div className="feed-post-meta">
+                      <span className="feed-post-author">{post.author}</span>
+                      <span className="feed-post-handle">@{post.authorHandle}</span>
+                      <span className="feed-post-time">{formatDate(post.timestamp)}</span>
+                      <span className="feed-post-platform" style={{ backgroundColor: platformColor(post.platform) + '20', color: platformColor(post.platform) }}>
+                        {post.platform === 'bluesky' ? '🦋' : '🐘'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
-        {/* Filter wall - SPLASH & FILTER pages */}
-        <div className="filter-wall">
-          <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
-          
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">F</div></div><div className="bubble bubble-f" onClick={(e) => goToFeedPage(e)}>f</div><div className="filter-bar" data-bar="0"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>AI</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">I</div></div><div className="bubble bubble-e1" onClick={(e) => goToFeedPage(e)}>e</div><div className="filter-bar" data-bar="1"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>Ad</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">L</div></div><div className="bubble bubble-e2" onClick={(e) => goToFeedPage(e)}>e</div><div className="filter-bar" data-bar="2"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>W1</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">T</div></div><div className="bubble bubble-d" onClick={(e) => goToFeedPage(e)}>d</div><div className="filter-bar" data-bar="3"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B1</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">E</div></div><div className="bubble bubble-s" onClick={(e) => goToFeedPage(e)}>s</div><div className="filter-bar" data-bar="4"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B2</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">R</div></div><div className="filter-bar" data-bar="5"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>CU</div></div></div>
-          
-          <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
+                <p className="feed-post-text">{post.text}</p>
+
+                {post.images.length > 0 && (
+                  <div className={`feed-post-images ${post.images.length > 1 ? 'multi' : ''}`}>
+                    {post.images.map((img, idx) => (
+                      <img
+                        key={idx}
+                        src={img}
+                        alt="Post image"
+                        onError={(e) => {
+                          console.warn(`Image failed to load: ${img} (${post.platform})`);
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
+                        onLoad={() => {
+                          console.log(`Image loaded: ${post.platform}`);
+                        }}
+                      />
+                    ))}
+                  </div>
+                )}
+
+                <div className="feed-post-stats">
+                  <span>💬 {post.replyCount}</span>
+                  <span>🔄 {post.repostCount}</span>
+                  <span>❤️ {post.likeCount}</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
+      )}
 
-        {/* Feeds page */}
-        <div className="feeds-page">
-          {/* Left Panel: SM Icons */}
-          <div className="feeds-left-panel">
-            <div className="feeds-icons-grid">
-              <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'bluesky')}>
-                <div className="feeds-icon-emoji">🦋</div>
-                <div className="feeds-icon-label">Bluesky</div>
+      {/* Control Panel */}
+      {page === 'control' && (
+        <div className="control-panel">
+          <div 
+            ref={containerRef}
+            className={`interactive-container ${currentMode === 'filter' ? 'filter-mode' : ''} ${currentMode === 'feeds' ? 'feed-mode' : ''}`}
+          >
+            {/* Logo */}
+            <div className="logo" onClick={() => setPage('feed')}>
+              <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100" height="100" rx="16" fill="rgba(0,217,255,0.1)" stroke="rgba(0,217,255,0.3)" strokeWidth="1"/>
+                <g transform="translate(50,50)">
+                  <line x1="-15" y1="-20" x2="-15" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
+                  <line x1="-8" y1="-20" x2="-8" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
+                  <line x1="-1" y1="-20" x2="-1" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
+                  <line x1="6" y1="-20" x2="6" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
+                  <line x1="13" y1="-20" x2="13" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
+                  <circle cx="-15" cy="-22" r="3" fill="rgba(0,217,255,0.8)"/>
+                  <circle cx="-8" cy="-24" r="3" fill="rgba(0,217,255,0.7)"/>
+                  <circle cx="-1" cy="-22" r="3" fill="rgba(0,217,255,0.7)"/>
+                  <circle cx="6" cy="-25" r="3" fill="rgba(0,217,255,0.6)"/>
+                  <circle cx="13" cy="-22" r="3" fill="rgba(0,217,255,0.8)"/>
+                </g>
+              </svg>
+              <div className="logo-text">Baleen</div>
+            </div>
+
+            {/* Back button */}
+            {currentMode !== 'splash' && (
+              <button className="back-button" onClick={goToSplash}>← Back</button>
+            )}
+
+            <div className="filter-label">Filter Controls</div>
+            <div className="feeds-label">Feed Sources</div>
+
+            {/* Filter wall */}
+            <div className="filter-wall">
+              <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
+              
+              <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">F</div></div><div className="bubble bubble-f" onClick={(e) => goToFeedPage(e)}>f</div><div className="filter-bar" data-bar="0"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>AI</div></div></div>
+              <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">I</div></div><div className="bubble bubble-e1" onClick={(e) => goToFeedPage(e)}>e</div><div className="filter-bar" data-bar="1"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>Ad</div></div></div>
+              <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">L</div></div><div className="bubble bubble-e2" onClick={(e) => goToFeedPage(e)}>e</div><div className="filter-bar" data-bar="2"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>W1</div></div></div>
+              <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">T</div></div><div className="bubble bubble-d" onClick={(e) => goToFeedPage(e)}>d</div><div className="filter-bar" data-bar="3"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B1</div></div></div>
+              <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">E</div></div><div className="bubble bubble-s" onClick={(e) => goToFeedPage(e)}>s</div><div className="filter-bar" data-bar="4"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B2</div></div></div>
+              <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">R</div></div><div className="filter-bar" data-bar="5"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>CU</div></div></div>
+              
+              <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
+            </div>
+
+            {/* Feeds page */}
+            <div className="feeds-page">
+              {/* Left Panel: SM Icons */}
+              <div className="feeds-left-panel">
+                <div className="feeds-icons-grid">
+                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'bluesky')}>
+                    <div className="feeds-icon-emoji">🦋</div>
+                    <div className="feeds-icon-label">Bluesky</div>
+                  </div>
+                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'mastodon')}>
+                    <div className="feeds-icon-emoji">🐘</div>
+                    <div className="feeds-icon-label">Mastodon</div>
+                  </div>
+                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'reddit')}>
+                    <div className="feeds-icon-emoji">🤖</div>
+                    <div className="feeds-icon-label">Reddit</div>
+                  </div>
+                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'substack')}>
+                    <div className="feeds-icon-emoji">📰</div>
+                    <div className="feeds-icon-label">Substack</div>
+                  </div>
+                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'twitter')}>
+                    <div className="feeds-icon-emoji">𝕏</div>
+                    <div className="feeds-icon-label">Twitter</div>
+                  </div>
+                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'threads')}>
+                    <div className="feeds-icon-emoji">🧵</div>
+                    <div className="feeds-icon-label">Threads</div>
+                  </div>
+                </div>
               </div>
-              <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'mastodon')}>
-                <div className="feeds-icon-emoji">🐘</div>
-                <div className="feeds-icon-label">Mastodon</div>
-              </div>
-              <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'reddit')}>
-                <div className="feeds-icon-emoji">🤖</div>
-                <div className="feeds-icon-label">Reddit</div>
-              </div>
-              <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'substack')}>
-                <div className="feeds-icon-emoji">📰</div>
-                <div className="feeds-icon-label">Substack</div>
-              </div>
-              <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'twitter')}>
-                <div className="feeds-icon-emoji">𝕏</div>
-                <div className="feeds-icon-label">Twitter</div>
-              </div>
-              <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'threads')}>
-                <div className="feeds-icon-emoji">🧵</div>
-                <div className="feeds-icon-label">Threads</div>
+
+              {/* Right Panel: Whale */}
+              <div className="whale-right-panel">
+                <div className="whale-svg-container">
+                  <Image
+                    src="/images/whale.jpg"
+                    alt="whale"
+                    width={400}
+                    height={400}
+                    style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 20px rgba(0, 217, 255, 0.4))' }}
+                    priority
+                  />
+                </div>
+
+                {/* Drop zone at mouth */}
+                <div 
+                  className="whale-mouth-zone"
+                  onDragOver={handleWhaleDragOver}
+                  onDragLeave={handleWhaleDragLeave}
+                  onDrop={handleWhaleDrop}
+                >
+                  <div style={{ textAlign: 'center', fontSize: '9px', lineHeight: '1.2', fontWeight: 700 }}>DROP FEED</div>
+                </div>
               </div>
             </div>
           </div>
-
-          {/* Right Panel: Whale */}
-          <div className="whale-right-panel">
-            <div className="whale-svg-container">
-              <Image
-                src="/images/whale.jpg"
-                alt="whale"
-                width={400}
-                height={400}
-                style={{ width: '100%', height: '100%', objectFit: 'contain', filter: 'drop-shadow(0 0 20px rgba(0, 217, 255, 0.4))' }}
-                priority
-              />
-            </div>
-
-            {/* Drop zone at mouth */}
-            <div 
-              className="whale-mouth-zone"
-              onDragOver={handleWhaleDragOver}
-              onDragLeave={handleWhaleDragLeave}
-              onDrop={handleWhaleDrop}
-            >
-              <div style={{ textAlign: 'center', fontSize: '9px', lineHeight: '1.2', fontWeight: 700 }}>DROP FEED</div>
-            </div>
-          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
