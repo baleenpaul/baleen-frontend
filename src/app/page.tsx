@@ -342,19 +342,19 @@ export default function InteractivePage() {
           animation: float-feeds 6s ease-in-out infinite;
         }
 
-        /* Bubbles positioned in grid columns to spell FEEDS */
-        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 12%; top: 50%; transform: translateY(-50%); animation-delay: 0s; }
-        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; left: 30%; top: 50%; transform: translateY(-50%); animation-delay: 0.8s; }
-        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; left: 48%; top: 50%; transform: translateY(-50%); animation-delay: 1.6s; }
-        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; left: 66%; top: 50%; transform: translateY(-50%); animation-delay: 2.4s; }
-        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 84%; top: 50%; transform: translateY(-50%); animation-delay: 3.2s; }
+        /* Bubbles aligned with FILTER grid columns - F I L T E R */
+        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 11%; top: 50%; transform: translateY(-50%); animation-delay: 0s; }
+        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; left: 27%; top: 50%; transform: translateY(-50%); animation-delay: 0.8s; }
+        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; left: 43%; top: 50%; transform: translateY(-50%); animation-delay: 1.6s; }
+        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; left: 59%; top: 50%; transform: translateY(-50%); animation-delay: 2.4s; }
+        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 75%; top: 50%; transform: translateY(-50%); animation-delay: 3.2s; }
 
         @keyframes float-feeds {
-          0% { transform: translateY(calc(-50% - 100px)); opacity: 0; }
+          0% { transform: translateY(calc(-50% - 120px)); opacity: 0; }
           15% { opacity: 1; }
           50% { transform: translateY(-50%); }
           85% { opacity: 1; }
-          100% { transform: translateY(calc(-50% + 100px)); opacity: 0; }
+          100% { transform: translateY(calc(-50% + 120px)); opacity: 0; }
         }
 
         .filter-mode .bubble { opacity: 0; pointer-events: none; }
@@ -399,17 +399,17 @@ export default function InteractivePage() {
           align-items: center;
           gap: 8px;
           padding: 16px;
-          background: rgba(0, 217, 255, 0.05);
-          border: 1px solid rgba(0, 217, 255, 0.3);
+          background: radial-gradient(circle at 30% 30%, rgba(0, 217, 255, 0.3), rgba(0, 217, 255, 0.05));
+          border: 1px solid rgba(0, 217, 255, 0.4);
           border-radius: 50%;
           cursor: grab;
-          transition: all 0.3s ease-in-out;
           user-select: none;
           width: 80px;
           height: 80px;
           justify-content: center;
-          box-shadow: 0 0 20px rgba(0, 217, 255, 0.2), inset 0 0 10px rgba(0, 217, 255, 0.1);
+          box-shadow: 0 0 25px rgba(0, 217, 255, 0.2), inset -10px -10px 20px rgba(0, 0, 0, 0.3), inset 5px 5px 15px rgba(0, 217, 255, 0.1);
           animation: float-icon 4s ease-in-out infinite;
+          transition: all 0.3s ease-in-out;
         }
 
         .feeds-icon:nth-child(1) { animation-delay: 0s; }
@@ -420,15 +420,15 @@ export default function InteractivePage() {
         .feeds-icon:nth-child(6) { animation-delay: 1.5s; }
 
         @keyframes float-icon {
-          0%, 100% { transform: translateY(0); box-shadow: 0 0 20px rgba(0, 217, 255, 0.2), inset 0 0 10px rgba(0, 217, 255, 0.1); }
-          50% { transform: translateY(-15px); box-shadow: 0 0 30px rgba(0, 217, 255, 0.4), inset 0 0 15px rgba(0, 217, 255, 0.2); }
+          0%, 100% { transform: translateY(0); box-shadow: 0 0 25px rgba(0, 217, 255, 0.2), inset -10px -10px 20px rgba(0, 0, 0, 0.3), inset 5px 5px 15px rgba(0, 217, 255, 0.1); }
+          50% { transform: translateY(-15px); box-shadow: 0 0 40px rgba(0, 217, 255, 0.4), inset -10px -10px 20px rgba(0, 0, 0, 0.3), inset 5px 5px 15px rgba(0, 217, 255, 0.2); }
         }
 
         .feeds-icon:hover {
-          background: rgba(0, 217, 255, 0.15);
-          border-color: rgba(0, 217, 255, 0.6);
-          transform: scale(1.1);
-          box-shadow: 0 0 40px rgba(0, 217, 255, 0.5), inset 0 0 20px rgba(0, 217, 255, 0.3);
+          background: radial-gradient(circle at 30% 30%, rgba(0, 217, 255, 0.5), rgba(0, 217, 255, 0.1));
+          border-color: rgba(0, 217, 255, 0.7);
+          transform: scale(1.15);
+          box-shadow: 0 0 50px rgba(0, 217, 255, 0.5), inset -10px -10px 20px rgba(0, 0, 0, 0.4), inset 8px 8px 20px rgba(0, 217, 255, 0.2);
         }
 
         .feeds-icon-emoji {
