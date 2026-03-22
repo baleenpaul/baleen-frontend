@@ -27,6 +27,13 @@ export default function InteractivePage() {
   };
 
   useEffect(() => {
+    // Initialize bars with default values
+    barValues.forEach((value, index) => {
+      updateBar(index, value);
+    });
+  }, []);
+
+  useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const filterBarText = target.closest('[data-bar-text]');
@@ -229,10 +236,12 @@ export default function InteractivePage() {
           transition: all 0.6s ease-in-out;
           opacity: 1;
           pointer-events: all;
+          visibility: visible;
         }
 
         .letter-strand:hover { transform: scale(1.05); }
-        .filter-mode .letter-strand { opacity: 0; pointer-events: none; }
+        .filter-mode .letter-strand { opacity: 0; pointer-events: none; visibility: hidden; }
+        .feed-mode .letter-strand { opacity: 0; pointer-events: none; visibility: hidden; }
 
         .letter-strand:nth-of-type(1) { animation-delay: 0s; }
         .letter-strand:nth-of-type(2) { animation-delay: 0.3s; }
@@ -336,24 +345,22 @@ export default function InteractivePage() {
           font-size: 24px;
           font-weight: 700;
           cursor: pointer;
-          opacity: 0;
-          pointer-events: none;
+          opacity: 1;
+          pointer-events: all;
           box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
           animation: float-feeds 6s ease-in-out infinite;
         }
 
-        /* Bubbles only visible on splash page */
-        .interactive-container:not(.filter-mode):not(.feed-mode) .bubble {
-          opacity: 1;
-          pointer-events: all;
-        }
-
         /* Bubbles aligned with FILTER grid columns - F I L T E R */
-        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 11%; top: 50%; transform: translateY(-50%); animation-delay: 0s; }
-        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; left: 27%; top: 50%; transform: translateY(-50%); animation-delay: 0.8s; }
-        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; left: 43%; top: 50%; transform: translateY(-50%); animation-delay: 1.6s; }
-        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; left: 59%; top: 50%; transform: translateY(-50%); animation-delay: 2.4s; }
-        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 75%; top: 50%; transform: translateY(-50%); animation-delay: 3.2s; }
+        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 23%; top: 50%; transform: translateY(-50%); animation-delay: 0s; }
+        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; left: 36%; top: 50%; transform: translateY(-50%); animation-delay: 0.8s; }
+        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; left: 47%; top: 50%; transform: translateY(-50%); animation-delay: 1.6s; }
+        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; left: 60%; top: 50%; transform: translateY(-50%); animation-delay: 2.4s; }
+        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 71%; top: 50%; transform: translateY(-50%); animation-delay: 3.2s; }
+
+        /* Bubbles hidden on filter and feed pages - disable animation */
+        .filter-mode .bubble { opacity: 0 !important; pointer-events: none; animation: none !important; }
+        .feed-mode .bubble { opacity: 0 !important; pointer-events: none; animation: none !important; }
 
         @keyframes float-feeds {
           0% { transform: translateY(calc(-50% - 120px)); opacity: 0; }
@@ -574,12 +581,12 @@ export default function InteractivePage() {
         <div className="filter-wall">
           <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
           
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">F</div></div><div className="filter-bar" data-bar="0"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text">AI</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">I</div></div><div className="filter-bar" data-bar="1"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text">Ad</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">L</div></div><div className="filter-bar" data-bar="2"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text">W1</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">T</div></div><div className="filter-bar" data-bar="3"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text">B1</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">E</div></div><div className="filter-bar" data-bar="4"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text">B2</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">R</div></div><div className="filter-bar" data-bar="5"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text">CU</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">F</div></div><div className="filter-bar" data-bar="0"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>AI</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">I</div></div><div className="filter-bar" data-bar="1"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>Ad</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">L</div></div><div className="filter-bar" data-bar="2"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>W1</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">T</div></div><div className="filter-bar" data-bar="3"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B1</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">E</div></div><div className="filter-bar" data-bar="4"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B2</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">R</div></div><div className="filter-bar" data-bar="5"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>CU</div></div></div>
           
           <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
         </div>
