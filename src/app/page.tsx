@@ -170,7 +170,10 @@ export default function InteractivePage() {
           font-weight: 700;
           transition: all 0.3s ease-in-out;
           z-index: 100;
+          display: none;
         }
+
+        .filter-mode .back-button, .feed-mode .back-button { display: block; }
 
         .back-button:hover {
           background: rgba(0, 217, 255, 0.2);
@@ -187,6 +190,8 @@ export default function InteractivePage() {
           align-items: center;
           justify-content: center;
         }
+
+        .feed-mode .filter-wall { display: none !important; }
 
         .decorative-side {
           display: flex;
@@ -332,8 +337,6 @@ export default function InteractivePage() {
         .filter-bar-text:active { cursor: grabbing; }
         .feed-mode .filter-bar-text { display: none; }
 
-        .bubble-container { position: absolute; width: 100%; height: 100%; pointer-events: none; }
-
         .bubble {
           position: absolute;
           width: 48px;
@@ -349,28 +352,29 @@ export default function InteractivePage() {
           pointer-events: all;
           box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
           animation: float-feeds 6s ease-in-out infinite;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 5;
+          margin-left: 35px;
         }
 
-        /* Bubbles aligned with FILTER grid columns - F I L T E R */
-        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 23%; top: 50%; transform: translateY(-50%); animation-delay: 0s; }
-        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; left: 36%; top: 50%; transform: translateY(-50%); animation-delay: 0.8s; }
-        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; left: 47%; top: 50%; transform: translateY(-50%); animation-delay: 1.6s; }
-        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; left: 60%; top: 50%; transform: translateY(-50%); animation-delay: 2.4s; }
-        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 71%; top: 50%; transform: translateY(-50%); animation-delay: 3.2s; }
-
-        /* Bubbles hidden on filter and feed pages - disable animation */
-        .filter-mode .bubble { opacity: 0 !important; pointer-events: none; animation: none !important; }
-        .feed-mode .bubble { opacity: 0 !important; pointer-events: none; animation: none !important; }
+        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; animation-delay: 0s; }
+        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; animation-delay: 0.8s; }
+        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; animation-delay: 1.6s; }
+        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; animation-delay: 2.4s; }
+        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; animation-delay: 3.2s; }
 
         @keyframes float-feeds {
-          0% { transform: translateY(calc(-50% - 120px)); opacity: 0; }
+          0% { transform: translate(-50%, calc(-50% - 120px)); opacity: 0; }
           15% { opacity: 1; }
-          50% { transform: translateY(-50%); }
+          50% { transform: translate(-50%, -50%); }
           85% { opacity: 1; }
-          100% { transform: translateY(calc(-50% + 120px)); opacity: 0; }
+          100% { transform: translate(-50%, calc(-50% + 120px)); opacity: 0; }
         }
 
-        .feed-mode .filter-wall { opacity: 0; pointer-events: none; visibility: hidden; }
+        .filter-mode .bubble { opacity: 0 !important; pointer-events: none; animation: none !important; }
+        .feed-mode .bubble { opacity: 0 !important; pointer-events: none; animation: none !important; }
 
         .feeds-page {
           position: absolute;
@@ -581,23 +585,14 @@ export default function InteractivePage() {
         <div className="filter-wall">
           <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
           
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">F</div></div><div className="filter-bar" data-bar="0"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>AI</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">I</div></div><div className="filter-bar" data-bar="1"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>Ad</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">L</div></div><div className="filter-bar" data-bar="2"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>W1</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">T</div></div><div className="filter-bar" data-bar="3"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B1</div></div></div>
-          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">E</div></div><div className="filter-bar" data-bar="4"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B2</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">F</div></div><div className="bubble bubble-f" onClick={(e) => goToFeedPage(e)}>f</div><div className="filter-bar" data-bar="0"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>AI</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">I</div></div><div className="bubble bubble-e1" onClick={(e) => goToFeedPage(e)}>e</div><div className="filter-bar" data-bar="1"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>Ad</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">L</div></div><div className="bubble bubble-e2" onClick={(e) => goToFeedPage(e)}>e</div><div className="filter-bar" data-bar="2"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>W1</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">T</div></div><div className="bubble bubble-d" onClick={(e) => goToFeedPage(e)}>d</div><div className="filter-bar" data-bar="3"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B1</div></div></div>
+          <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">E</div></div><div className="bubble bubble-s" onClick={(e) => goToFeedPage(e)}>s</div><div className="filter-bar" data-bar="4"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>B2</div></div></div>
           <div className="grid-item"><div className="letter-strand" onClick={goToFilterPage}><div className="letter-text">R</div></div><div className="filter-bar" data-bar="5"><div className="filter-bar-outline"></div><div className="filter-bar-fill"></div><div className="filter-bar-text" data-bar-text>CU</div></div></div>
           
           <div className="decorative-side"><div className="mini-strand"></div><div className="mini-strand"></div><div className="mini-strand"></div></div>
-        </div>
-
-        {/* Bubbles - SPLASH page only */}
-        <div className="bubble-container">
-          <div className="bubble bubble-f" onClick={(e) => goToFeedPage(e)}>f</div>
-          <div className="bubble bubble-e1" onClick={(e) => goToFeedPage(e)}>e</div>
-          <div className="bubble bubble-e2" onClick={(e) => goToFeedPage(e)}>e</div>
-          <div className="bubble bubble-d" onClick={(e) => goToFeedPage(e)}>d</div>
-          <div className="bubble bubble-s" onClick={(e) => goToFeedPage(e)}>s</div>
         </div>
 
         {/* Feeds page */}
