@@ -25,12 +25,12 @@ export default function InteractivePage() {
   const [feedLoading, setFeedLoading] = useState(true);
   const dragStateRef = useRef({ active: false, bar: null as number | null, barRect: null as DOMRect | null });
 
-  // Landing page: show for 3 seconds then transition to feed
+  // Landing page: show for 5 seconds then transition to feed
   useEffect(() => {
     if (page === 'landing') {
       const timer = setTimeout(() => {
         setPage('feed');
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
   }, [page]);
@@ -200,6 +200,12 @@ export default function InteractivePage() {
           justify-content: center;
           z-50;
           background: linear-gradient(to br, #0f0f1e, #000000, #1a0f2e);
+          animation: landingFadeOut 1s ease-in 4s forwards;
+        }
+
+        @keyframes landingFadeOut {
+          0% { opacity: 1; }
+          100% { opacity: 0; }
         }
 
         @keyframes fadeInScale {
@@ -310,6 +316,10 @@ export default function InteractivePage() {
           font-size: 12px;
           text-transform: uppercase;
           letter-spacing: 1px;
+          background: linear-gradient(135deg, #00d9ff 0%, #0099ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
         }
 
         .feed-refresh {
@@ -481,7 +491,10 @@ export default function InteractivePage() {
           font-family: Arial, sans-serif;
           font-size: 14px;
           font-weight: 700;
-          color: rgba(0, 217, 255, 0.7);
+          background: linear-gradient(135deg, #00d9ff 0%, #0099ff 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
