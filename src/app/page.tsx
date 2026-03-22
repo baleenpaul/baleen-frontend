@@ -407,8 +407,8 @@ export default function InteractivePage() {
         }
 
         .feed-post-platform {
-          font-size: 10px;
-          padding: 4px 8px;
+          font-size: 20px;
+          padding: 8px 12px;
           border-radius: 4px;
           font-weight: bold;
         }
