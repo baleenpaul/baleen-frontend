@@ -336,25 +336,30 @@ export default function InteractivePage() {
           font-size: 24px;
           font-weight: 700;
           cursor: pointer;
-          transition: all 0.4s ease-in-out;
           opacity: 1;
           pointer-events: all;
           box-shadow: 0 0 15px rgba(0, 217, 255, 0.4);
-          animation: float-bubble 4s ease-in-out infinite;
+          animation: float-feeds 6s ease-in-out infinite;
         }
 
-        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 15%; top: 20%; animation-delay: 0s; }
-        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; right: 20%; top: 30%; animation-delay: 0.5s; }
-        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; left: 35%; bottom: 25%; animation-delay: 1s; }
-        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; right: 15%; bottom: 30%; animation-delay: 1.5s; }
-        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 50%; top: 50%; transform: translateX(-50%) translateY(-50%); animation-delay: 2s; }
+        /* Bubbles positioned in grid columns to spell FEEDS */
+        .bubble-f { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 12%; top: 50%; transform: translateY(-50%); animation-delay: 0s; }
+        .bubble-e1 { background: rgba(0, 153, 255, 0.2); color: #0099ff; left: 30%; top: 50%; transform: translateY(-50%); animation-delay: 0.8s; }
+        .bubble-e2 { background: rgba(0, 217, 255, 0.15); color: #00d9ff; left: 48%; top: 50%; transform: translateY(-50%); animation-delay: 1.6s; }
+        .bubble-d { background: rgba(0, 153, 255, 0.15); color: #0099ff; left: 66%; top: 50%; transform: translateY(-50%); animation-delay: 2.4s; }
+        .bubble-s { background: rgba(0, 217, 255, 0.2); color: #00d9ff; left: 84%; top: 50%; transform: translateY(-50%); animation-delay: 3.2s; }
 
-        @keyframes float-bubble {
-          0%, 100% { transform: translateY(0); box-shadow: 0 0 15px rgba(0, 217, 255, 0.4); }
-          50% { transform: translateY(-20px); box-shadow: 0 0 25px rgba(0, 217, 255, 0.7); }
+        @keyframes float-feeds {
+          0% { transform: translateY(calc(-50% - 100px)); opacity: 0; }
+          15% { opacity: 1; }
+          50% { transform: translateY(-50%); }
+          85% { opacity: 1; }
+          100% { transform: translateY(calc(-50% + 100px)); opacity: 0; }
         }
 
+        .filter-mode .bubble { opacity: 0; pointer-events: none; }
         .feed-mode .bubble { opacity: 0; pointer-events: none; }
+        .feed-mode .filter-wall { opacity: 0; pointer-events: none; visibility: hidden; }
 
         .feeds-page {
           position: absolute;
@@ -396,17 +401,34 @@ export default function InteractivePage() {
           padding: 16px;
           background: rgba(0, 217, 255, 0.05);
           border: 1px solid rgba(0, 217, 255, 0.3);
-          border-radius: 8px;
+          border-radius: 50%;
           cursor: grab;
           transition: all 0.3s ease-in-out;
           user-select: none;
+          width: 80px;
+          height: 80px;
+          justify-content: center;
+          box-shadow: 0 0 20px rgba(0, 217, 255, 0.2), inset 0 0 10px rgba(0, 217, 255, 0.1);
+          animation: float-icon 4s ease-in-out infinite;
+        }
+
+        .feeds-icon:nth-child(1) { animation-delay: 0s; }
+        .feeds-icon:nth-child(2) { animation-delay: 0.3s; }
+        .feeds-icon:nth-child(3) { animation-delay: 0.6s; }
+        .feeds-icon:nth-child(4) { animation-delay: 0.9s; }
+        .feeds-icon:nth-child(5) { animation-delay: 1.2s; }
+        .feeds-icon:nth-child(6) { animation-delay: 1.5s; }
+
+        @keyframes float-icon {
+          0%, 100% { transform: translateY(0); box-shadow: 0 0 20px rgba(0, 217, 255, 0.2), inset 0 0 10px rgba(0, 217, 255, 0.1); }
+          50% { transform: translateY(-15px); box-shadow: 0 0 30px rgba(0, 217, 255, 0.4), inset 0 0 15px rgba(0, 217, 255, 0.2); }
         }
 
         .feeds-icon:hover {
           background: rgba(0, 217, 255, 0.15);
           border-color: rgba(0, 217, 255, 0.6);
-          transform: scale(1.05);
-          box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+          transform: scale(1.1);
+          box-shadow: 0 0 40px rgba(0, 217, 255, 0.5), inset 0 0 20px rgba(0, 217, 255, 0.3);
         }
 
         .feeds-icon-emoji {
@@ -445,7 +467,7 @@ export default function InteractivePage() {
 
         .whale-mouth-zone {
           position: absolute;
-          bottom: 80px;
+          bottom: 35%;
           left: 50%;
           transform: translateX(-50%);
           width: 150px;
