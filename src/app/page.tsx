@@ -35,17 +35,27 @@ export default function InteractivePage() {
     }
   }, [page]);
 
-  // Fetch feed data
+  // Initial fetch when landing on feed page
   useEffect(() => {
     if (page === 'feed') {
       fetchFeed();
     }
   }, [page]);
 
+  // Refetch feed when filters change (while on feed page)
+  useEffect(() => {
+    if (page === 'feed') {
+      fetchFeed();
+    }
+  }, [barValues]);
+
   const fetchFeed = async () => {
     try {
       setFeedLoading(true);
-      const response = await fetch('https://baleen-backend.onrender.com/feed');
+      // Wire filter bars to API: barValues[0] = AI Slop sensitivity (0-100)
+      const aiSensitivity = barValues[0];
+      const filterUrl = `https://baleen-backend.onrender.com/feed?filterAI=true&sensitivity=${aiSensitivity}`;
+      const response = await fetch(filterUrl);
       const data = await response.json();
       if (data.items) {
         // Sort by timestamp descending (newest first)
@@ -896,7 +906,14 @@ export default function InteractivePage() {
             />
           </div>
           <div className="landing-logo">
-            <div className="landing-logo-text">IIB</div>
+            <Image
+              src="/images/IIB_logo.png"
+              alt="IIB Baleen"
+              width={80}
+              height={80}
+              style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+              priority
+            />
           </div>
           <div className="landing-text">Baleen</div>
           <div className="landing-tagline">Unified Feed, without the noise</div>
@@ -908,8 +925,13 @@ export default function InteractivePage() {
         <div className="live-feed">
           <div className="feed-header">
             <div className="feed-header-logo" onClick={() => setPage('control')}>
-              <div className="feed-header-logo-box">IIB</div>
-              <div className="feed-header-text">Baleen</div>
+              <Image
+                src="/images/IIB_logo.png"
+                alt="IIB Baleen"
+                width={50}
+                height={50}
+                style={{ width: '50px', height: '50px', objectFit: 'contain' }}
+              />
             </div>
             <button className="feed-refresh" onClick={() => fetchFeed()}>Refresh</button>
           </div>
@@ -976,22 +998,13 @@ export default function InteractivePage() {
           >
             {/* Logo */}
             <div className="logo" onClick={() => setPage('feed')}>
-              <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <rect width="100" height="100" rx="16" fill="rgba(0,217,255,0.1)" stroke="rgba(0,217,255,0.3)" strokeWidth="1"/>
-                <g transform="translate(50,50)">
-                  <line x1="-15" y1="-20" x2="-15" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-                  <line x1="-8" y1="-20" x2="-8" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-                  <line x1="-1" y1="-20" x2="-1" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-                  <line x1="6" y1="-20" x2="6" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-                  <line x1="13" y1="-20" x2="13" y2="20" stroke="rgba(0,217,255,0.8)" strokeWidth="2.5"/>
-                  <circle cx="-15" cy="-22" r="3" fill="rgba(0,217,255,0.8)"/>
-                  <circle cx="-8" cy="-24" r="3" fill="rgba(0,217,255,0.7)"/>
-                  <circle cx="-1" cy="-22" r="3" fill="rgba(0,217,255,0.7)"/>
-                  <circle cx="6" cy="-25" r="3" fill="rgba(0,217,255,0.6)"/>
-                  <circle cx="13" cy="-22" r="3" fill="rgba(0,217,255,0.8)"/>
-                </g>
-              </svg>
-              <div className="logo-text">Baleen</div>
+              <Image
+                src="/images/IIB_logo.png"
+                alt="IIB Baleen"
+                width={80}
+                height={80}
+                style={{ width: '80px', height: '80px', objectFit: 'contain' }}
+              />
             </div>
 
             {/* Back button */}
