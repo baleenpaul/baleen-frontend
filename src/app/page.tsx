@@ -53,8 +53,11 @@ export default function InteractivePage() {
     try {
       setFeedLoading(true);
       // Wire filter bars to API: barValues[0] = AI Slop sensitivity (0-100)
-      const aiSensitivity = barValues[0];
-      const filterUrl = `https://baleen-backend.onrender.com/feed?filterAI=true&sensitivity=${aiSensitivity}`;
+      const aiSensitivity = Math.round(barValues[0]);
+      const params = new URLSearchParams();
+      params.append('filterAI', 'true');
+      params.append('sensitivity', aiSensitivity.toString());
+      const filterUrl = `https://baleen-backend.onrender.com/feed?${params.toString()}`;
       const response = await fetch(filterUrl);
       const data = await response.json();
       if (data.items) {
