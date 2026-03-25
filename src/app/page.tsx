@@ -33,6 +33,23 @@ export default function InteractivePage() {
   const [liftedFilters, setLiftedFilters] = useState<Set<string>>(new Set());
   const dragStateRef = useRef({ active: false, bar: null as number | null, barRect: null as DOMRect | null });
 
+  // Load filter settings from localStorage on mount
+  useEffect(() => {
+    const savedValues = localStorage.getItem('baleen-filter-values');
+    if (savedValues) {
+      try {
+        setBarValues(JSON.parse(savedValues));
+      } catch (e) {
+        console.warn('Failed to load filter values from localStorage');
+      }
+    }
+  }, []);
+
+  // Save filter settings to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('baleen-filter-values', JSON.stringify(barValues));
+  }, [barValues]);
+
   // Landing page: show for 5 seconds then transition to feed
   useEffect(() => {
     if (page === 'landing') {
