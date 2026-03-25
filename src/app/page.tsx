@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
+import { AIWarningBadge } from './components/AIWarningBadge';
 
 interface FeedItem {
   id: string;
@@ -14,6 +15,12 @@ interface FeedItem {
   repostCount: number;
   replyCount: number;
   images: string[];
+  // AI Detection fields
+  aiScore?: number;
+  isAI?: boolean;
+  aiEvidence?: string[];
+  aiWarning?: boolean;
+  aiBlocked?: boolean;
 }
 
 export default function InteractivePage() {
@@ -23,6 +30,7 @@ export default function InteractivePage() {
   const [barValues, setBarValues] = useState([50, 50, 50, 50, 50, 50]);
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [feedLoading, setFeedLoading] = useState(true);
+  const [liftedFilters, setLiftedFilters] = useState<Set<string>>(new Set());
   const dragStateRef = useRef({ active: false, bar: null as number | null, barRect: null as DOMRect | null });
 
   // Landing page: show for 5 seconds then transition to feed
@@ -942,52 +950,74 @@ export default function InteractivePage() {
           {feedLoading ? (
             <div className="feed-loading">Loading feed...</div>
           ) : (
-            feed.map((post) => (
-              <div key={post.id} className="feed-post">
-                <div className="feed-post-header">
-                  <div className="feed-post-avatar" style={{ color: platformColor(post.platform) }}>
-                    {post.author.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="feed-post-info">
-                    <div className="feed-post-meta">
-                      <span className="feed-post-author">{post.author}</span>
-                      <span className="feed-post-handle">@{post.authorHandle}</span>
-                      <span className="feed-post-time">{formatDate(post.timestamp)}</span>
-                      <span className="feed-post-platform" style={{ backgroundColor: platformColor(post.platform) + '20', color: platformColor(post.platform) }}>
-                        {post.platform === 'bluesky' ? '🦋' : '🐘'}
-                      </span>
+            feed.map((post) => {
+              const filterLifted = liftedFilters.has(post.id);
+              const shouldHide = post.aiBlocked && !filterLifted;
+              const showWarning = (post.aiWarning || post.aiBlocked) && !filterLifted;
+
+              if (shouldHide) {
+                return null; // Completely hide blocked posts unless filter lifted
+              }
+
+              return (
+                <div key={post.id} className="feed-post">
+                  {showWarning && (
+                    <AIWarningBadge
+                      aiScore={post.aiScore}
+                      isWarning={post.aiWarning}
+                      isBlocked={post.aiBlocked}
+                      evidence={post.aiEvidence}
+                      onDismiss={() => {
+                        setLiftedFilters(prev => new Set([...prev, post.id]));
+                      }}
+                    />
+                  )}
+
+                  <div className="feed-post-header">
+                    <div className="feed-post-avatar" style={{ color: platformColor(post.platform) }}>
+                      {post.author.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="feed-post-info">
+                      <div className="feed-post-meta">
+                        <span className="feed-post-author">{post.author}</span>
+                        <span className="feed-post-handle">@{post.authorHandle}</span>
+                        <span className="feed-post-time">{formatDate(post.timestamp)}</span>
+                        <span className="feed-post-platform" style={{ backgroundColor: platformColor(post.platform) + '20', color: platformColor(post.platform) }}>
+                          {post.platform === 'bluesky' ? '🦋' : '🐘'}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <p className="feed-post-text">{post.text}</p>
+                  <p className="feed-post-text">{post.text}</p>
 
-                {post.images.length > 0 && (
-                  <div className={`feed-post-images ${post.images.length > 1 ? 'multi' : ''}`}>
-                    {post.images.map((img, idx) => (
-                      <img
-                        key={idx}
-                        src={img}
-                        alt="Post image"
-                        onError={(e) => {
-                          console.warn(`Image failed to load: ${img} (${post.platform})`);
-                          (e.target as HTMLImageElement).style.display = 'none';
-                        }}
-                        onLoad={() => {
-                          console.log(`Image loaded: ${post.platform}`);
-                        }}
-                      />
-                    ))}
+                  {post.images.length > 0 && (
+                    <div className={`feed-post-images ${post.images.length > 1 ? 'multi' : ''}`}>
+                      {post.images.map((img, idx) => (
+                        <img
+                          key={idx}
+                          src={img}
+                          alt="Post image"
+                          onError={(e) => {
+                            console.warn(`Image failed to load: ${img} (${post.platform})`);
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                          onLoad={() => {
+                            console.log(`Image loaded: ${post.platform}`);
+                          }}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="feed-post-stats">
+                    <span>💬 {post.replyCount}</span>
+                    <span>🔄 {post.repostCount}</span>
+                    <span>❤️ {post.likeCount}</span>
                   </div>
-                )}
-
-                <div className="feed-post-stats">
-                  <span>💬 {post.replyCount}</span>
-                  <span>🔄 {post.repostCount}</span>
-                  <span>❤️ {post.likeCount}</span>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       )}
