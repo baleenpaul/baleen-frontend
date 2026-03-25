@@ -972,24 +972,35 @@ export default function InteractivePage() {
           ) : (
             feed.map((post) => {
               const filterLifted = liftedFilters.has(post.id);
-              const shouldHide = post.aiBlocked && !filterLifted;
-              const showWarning = (post.aiWarning || post.aiBlocked) && !filterLifted;
+              const showWarning = post.aiWarning && !filterLifted;
 
-              if (shouldHide) {
-                return null; // Completely hide blocked posts unless filter lifted
-              }
-
-              return (
-                <div key={post.id} className="feed-post">
-                  {showWarning && (
+              // If warning is active and filter not lifted, show ONLY warning badge
+              if (showWarning) {
+                return (
+                  <div key={post.id}>
                     <AIWarningBadge
                       aiScore={post.aiScore}
                       isWarning={post.aiWarning}
-                      isBlocked={post.aiBlocked}
+                      isBlocked={false}
                       evidence={post.aiEvidence}
                       onDismiss={() => {
                         setLiftedFilters(prev => new Set([...prev, post.id]));
                       }}
+                    />
+                  </div>
+                );
+              }
+
+              // Filter lifted or no warning - show normal post (with warning badge if lifted from warning)
+              return (
+                <div key={post.id} className="feed-post">
+                  {filterLifted && post.aiWarning && (
+                    <AIWarningBadge
+                      aiScore={post.aiScore}
+                      isWarning={false}
+                      isBlocked={false}
+                      evidence={post.aiEvidence}
+                      onDismiss={() => {}} // Already lifted, so no action needed
                     />
                   )}
 
