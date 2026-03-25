@@ -969,82 +969,67 @@ export default function InteractivePage() {
 
           {feedLoading ? (
             <div className="feed-loading">Loading feed...</div>
+          ) : feed.length === 0 ? (
+            <div className="feed-loading">No posts found</div>
           ) : (
             feed.map((post) => {
               const filterLifted = liftedFilters.has(post.id);
               const showWarning = post.aiWarning && !filterLifted;
 
-              // If warning is active and filter not lifted, show ONLY warning badge
-              if (showWarning) {
-                return (
-                  <div key={post.id}>
+              return (
+                <div key={post.id}>
+                  {showWarning && (
                     <AIWarningBadge
                       aiScore={post.aiScore}
-                      isWarning={post.aiWarning}
+                      isWarning={true}
                       isBlocked={false}
                       evidence={post.aiEvidence}
                       onDismiss={() => {
                         setLiftedFilters(prev => new Set([...prev, post.id]));
                       }}
                     />
-                  </div>
-                );
-              }
-
-              // Filter lifted or no warning - show normal post (with warning badge if lifted from warning)
-              return (
-                <div key={post.id} className="feed-post">
-                  {filterLifted && post.aiWarning && (
-                    <AIWarningBadge
-                      aiScore={post.aiScore}
-                      isWarning={false}
-                      isBlocked={false}
-                      evidence={post.aiEvidence}
-                      onDismiss={() => {}} // Already lifted, so no action needed
-                    />
                   )}
-
-                  <div className="feed-post-header">
-                    <div className="feed-post-avatar" style={{ color: platformColor(post.platform) }}>
-                      {post.author.charAt(0).toUpperCase()}
-                    </div>
-                    <div className="feed-post-info">
-                      <div className="feed-post-meta">
-                        <span className="feed-post-author">{post.author}</span>
-                        <span className="feed-post-handle">@{post.authorHandle}</span>
-                        <span className="feed-post-time">{formatDate(post.timestamp)}</span>
-                        <span className="feed-post-platform" style={{ backgroundColor: platformColor(post.platform) + '20', color: platformColor(post.platform) }}>
-                          {post.platform === 'bluesky' ? '🦋' : '🐘'}
-                        </span>
+                  
+                  <div className="feed-post">
+                    <div className="feed-post-header">
+                      <div className="feed-post-avatar" style={{ color: platformColor(post.platform) }}>
+                        {post.author.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="feed-post-info">
+                        <div className="feed-post-meta">
+                          <span className="feed-post-author">{post.author}</span>
+                          <span className="feed-post-handle">@{post.authorHandle}</span>
+                          <span className="feed-post-time">{formatDate(post.timestamp)}</span>
+                          <span className="feed-post-platform" style={{ backgroundColor: platformColor(post.platform) + '20', color: platformColor(post.platform) }}>
+                            {post.platform === 'bluesky' ? '🦋' : '🐘'}
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <p className="feed-post-text">{post.text}</p>
+                    <p className="feed-post-text">{post.text}</p>
 
-                  {post.images.length > 0 && (
-                    <div className={`feed-post-images ${post.images.length > 1 ? 'multi' : ''}`}>
-                      {post.images.map((img, idx) => (
-                        <img
-                          key={idx}
-                          src={img}
-                          alt="Post image"
-                          onError={(e) => {
-                            console.warn(`Image failed to load: ${img} (${post.platform})`);
-                            (e.target as HTMLImageElement).style.display = 'none';
-                          }}
-                          onLoad={() => {
-                            console.log(`Image loaded: ${post.platform}`);
-                          }}
-                        />
-                      ))}
+                    {post.images && post.images.length > 0 && (
+                      <div className={`feed-post-images ${post.images.length > 1 ? 'multi' : ''}`}>
+                        {post.images.map((img, idx) => (
+                          <img
+                            key={idx}
+                            src={img}
+                            alt="Post image"
+                            onError={(e) => {
+                              console.warn(`Image failed to load: ${img}`);
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="feed-post-stats">
+                      <span>💬 {post.replyCount}</span>
+                      <span>🔄 {post.repostCount}</span>
+                      <span>❤️ {post.likeCount}</span>
                     </div>
-                  )}
-
-                  <div className="feed-post-stats">
-                    <span>💬 {post.replyCount}</span>
-                    <span>🔄 {post.repostCount}</span>
-                    <span>❤️ {post.likeCount}</span>
                   </div>
                 </div>
               );
