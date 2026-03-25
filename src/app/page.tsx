@@ -27,23 +27,26 @@ export default function InteractivePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState<'landing' | 'feed' | 'control'>('landing');
   const [currentMode, setCurrentMode] = useState('splash');
-  const [barValues, setBarValues] = useState([50, 50, 50, 50, 50, 50]);
+  
+  // Load initial bar values from localStorage
+  const [barValues, setBarValues] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('baleen-filter-values');
+      if (saved) {
+        try {
+          return JSON.parse(saved);
+        } catch (e) {
+          return [50, 50, 50, 50, 50, 50];
+        }
+      }
+    }
+    return [50, 50, 50, 50, 50, 50];
+  });
+  
   const [feed, setFeed] = useState<FeedItem[]>([]);
   const [feedLoading, setFeedLoading] = useState(true);
   const [liftedFilters, setLiftedFilters] = useState<Set<string>>(new Set());
   const dragStateRef = useRef({ active: false, bar: null as number | null, barRect: null as DOMRect | null });
-
-  // Load filter settings from localStorage on mount
-  useEffect(() => {
-    const savedValues = localStorage.getItem('baleen-filter-values');
-    if (savedValues) {
-      try {
-        setBarValues(JSON.parse(savedValues));
-      } catch (e) {
-        console.warn('Failed to load filter values from localStorage');
-      }
-    }
-  }, []);
 
   // Save filter settings to localStorage whenever they change
   useEffect(() => {
