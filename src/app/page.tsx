@@ -268,6 +268,14 @@ export default function InteractivePage() {
           margin-bottom: 20px;
         }
 
+        @media (max-width: 480px) {
+          .landing-whale {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 12px;
+          }
+        }
+
         .landing-logo {
           animation: fadeInScale 0.8s ease-out 0.2s both;
           display: flex;
@@ -278,6 +286,15 @@ export default function InteractivePage() {
           background: linear-gradient(to br, #14b8a6, #06b6d4);
           border-radius: 20px;
           box-shadow: 0 0 40px rgba(0, 217, 255, 0.5);
+        }
+
+        @media (max-width: 480px) {
+          .landing-logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+          }
+        }
           margin-bottom: 20px;
         }
 
@@ -314,6 +331,21 @@ export default function InteractivePage() {
         .live-feed {
           max-width: 600px;
           margin: 0 auto;
+          padding: 0 8px;
+        }
+
+        @media (max-width: 768px) {
+          .live-feed {
+            max-width: 100%;
+            padding: 0 4px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .live-feed {
+            max-width: 100%;
+            padding: 0 2px;
+          }
         }
 
         .feed-header {
@@ -515,6 +547,24 @@ export default function InteractivePage() {
           overflow: hidden;
           border-radius: 12px;
           border: 0.5px solid rgba(0, 217, 255, 0.15);
+        }
+
+        @media (max-width: 768px) {
+          .interactive-container {
+            max-width: 100%;
+            height: auto;
+            min-height: 100vh;
+            border-radius: 0;
+            border: none;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .interactive-container {
+            max-width: 100%;
+            height: auto;
+            min-height: 100vh;
+          }
         }
 
         .logo {
