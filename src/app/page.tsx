@@ -139,7 +139,7 @@ export default function InteractivePage() {
   };
 
   useEffect(() => {
-    barValues.forEach((value, index) => {
+    barValues.forEach((value: number, index: number) => {
       updateBar(index, value);
     });
   }, []);
