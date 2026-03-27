@@ -145,8 +145,8 @@ export default function InteractivePage() {
   }, []);
 
   useEffect(() => {
-    const handleMouseDown = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
+    const handleMouseDown = (e: MouseEvent | TouchEvent) => {
+      const target = (e.target as HTMLElement);
       const filterBarText = target.closest('[data-bar-text]');
       
       if (filterBarText) {
@@ -155,7 +155,9 @@ export default function InteractivePage() {
           dragStateRef.current.active = true;
           dragStateRef.current.bar = parseInt(container.getAttribute('data-bar') || '0');
           dragStateRef.current.barRect = container.getBoundingClientRect();
-          e.preventDefault();
+          if (e instanceof MouseEvent) {
+            e.preventDefault();
+          }
         }
       }
     };
@@ -193,19 +195,19 @@ export default function InteractivePage() {
       dragStateRef.current.barRect = null;
     };
 
-    document.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mousedown', handleMouseDown as any);
+    document.addEventListener('mousemove', handleMouseMove as any);
     document.addEventListener('mouseup', handleMouseUp);
-    document.addEventListener('touchstart', handleMouseDown);
-    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchstart', handleMouseDown as any);
+    document.addEventListener('touchmove', handleTouchMove as any);
     document.addEventListener('touchend', handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mousedown', handleMouseDown as any);
+      document.removeEventListener('mousemove', handleMouseMove as any);
       document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchstart', handleMouseDown);
-      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchstart', handleMouseDown as any);
+      document.removeEventListener('touchmove', handleTouchMove as any);
       document.removeEventListener('touchend', handleMouseUp);
     };
   }, [barValues]);
