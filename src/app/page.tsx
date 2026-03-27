@@ -638,22 +638,6 @@ export default function InteractivePage() {
           }
         }
 
-        @media (max-width: 480px) {
-          .filter-wall {
-            transform: rotate(90deg);
-            transform-origin: center;
-            width: 100vh;
-            height: 100vw;
-            max-height: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            margin-left: calc(-50vw);
-            margin-top: calc(-50vh);
-            gap: 12px;
-          }
-        }
-
         .decorative-side {
           display: flex;
           flex-direction: column;
