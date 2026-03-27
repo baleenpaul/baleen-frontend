@@ -1171,21 +1171,25 @@ export default function InteractivePage() {
                     <div className="feeds-icon-emoji">🐘</div>
                     <div className="feeds-icon-label">Mastodon</div>
                   </div>
-                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'reddit')}>
+                  <div className="feeds-icon" style={{opacity: 0.4, cursor: 'not-allowed'}} title="Coming soon">
                     <div className="feeds-icon-emoji">🤖</div>
                     <div className="feeds-icon-label">Reddit</div>
+                    <div style={{fontSize: '10px', marginTop: '4px', color: '#00d9ff'}}>Coming soon</div>
                   </div>
-                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'substack')}>
+                  <div className="feeds-icon" style={{opacity: 0.4, cursor: 'not-allowed'}} title="Coming soon">
                     <div className="feeds-icon-emoji">📰</div>
                     <div className="feeds-icon-label">Substack</div>
+                    <div style={{fontSize: '10px', marginTop: '4px', color: '#00d9ff'}}>Coming soon</div>
                   </div>
-                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'twitter')}>
+                  <div className="feeds-icon" style={{opacity: 0.4, cursor: 'not-allowed'}} title="Coming soon">
                     <div className="feeds-icon-emoji">𝕏</div>
                     <div className="feeds-icon-label">Twitter</div>
+                    <div style={{fontSize: '10px', marginTop: '4px', color: '#00d9ff'}}>Coming soon</div>
                   </div>
-                  <div className="feeds-icon" draggable onDragStart={(e) => handleFeedIconDragStart(e, 'threads')}>
+                  <div className="feeds-icon" style={{opacity: 0.4, cursor: 'not-allowed'}} title="Coming soon">
                     <div className="feeds-icon-emoji">🧵</div>
                     <div className="feeds-icon-label">Threads</div>
+                    <div style={{fontSize: '10px', marginTop: '4px', color: '#00d9ff'}}>Coming soon</div>
                   </div>
                 </div>
               </div>
