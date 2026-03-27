@@ -173,6 +173,20 @@ export default function InteractivePage() {
       updateBar(dragStateRef.current.bar, newValue);
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!dragStateRef.current.active || !dragStateRef.current.barRect || dragStateRef.current.bar === null) return;
+      const barHeight = dragStateRef.current.barRect.height;
+      const touch = e.touches[0];
+      const relativY = touch.clientY - dragStateRef.current.barRect.top;
+      let newValue = ((barHeight - relativY) / barHeight) * 100;
+      newValue = Math.max(0, Math.min(100, newValue));
+      
+      const newBarValues = [...barValues];
+      newBarValues[dragStateRef.current.bar] = newValue;
+      setBarValues(newBarValues);
+      updateBar(dragStateRef.current.bar, newValue);
+    };
+
     const handleMouseUp = () => {
       dragStateRef.current.active = false;
       dragStateRef.current.bar = null;
@@ -182,11 +196,17 @@ export default function InteractivePage() {
     document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('touchstart', handleMouseDown);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleMouseUp);
 
     return () => {
       document.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchstart', handleMouseDown);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleMouseUp);
     };
   }, [barValues]);
 
