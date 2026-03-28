@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AIWarningBadge } from './components/AIWarningBadge';
+import { LinkCard } from './components/LinkCard';
 
 interface FeedItem {
   id: string;
@@ -15,6 +16,7 @@ interface FeedItem {
   repostCount: number;
   replyCount: number;
   images: string[];
+  links?: Array<{url: string; title?: string}>;
   // AI Detection fields
   aiScore?: number;
   isAI?: boolean;
@@ -542,6 +544,61 @@ export default function InteractivePage() {
 
         .feed-post-stats span:hover {
           color: rgba(0, 217, 255, 0.8);
+        }
+
+        .feed-post-links {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          margin-top: 12px;
+        }
+
+        .link-card {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 12px;
+          background: rgba(0, 217, 255, 0.08);
+          border: 1px solid rgba(0, 217, 255, 0.2);
+          border-radius: 6px;
+          text-decoration: none;
+          color: inherit;
+          transition: all 0.2s ease;
+        }
+
+        .link-card:hover {
+          background: rgba(0, 217, 255, 0.15);
+          border-color: rgba(0, 217, 255, 0.4);
+        }
+
+        .link-card-content {
+          flex: 1;
+          min-width: 0;
+        }
+
+        .link-card-title {
+          font-size: 13px;
+          font-weight: 500;
+          color: #00d9ff;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .link-card-url {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.4);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-top: 3px;
+        }
+
+        .link-card-icon {
+          font-size: 14px;
+          color: #00d9ff;
+          margin-left: 8px;
+          flex-shrink: 0;
         }
 
         /* Control Panel */
@@ -1104,6 +1161,8 @@ export default function InteractivePage() {
                         ))}
                       </div>
                     )}
+
+                    <LinkCard links={post.links || []} />
 
                     <div className="feed-post-stats">
                       <span>💬 {post.replyCount}</span>
