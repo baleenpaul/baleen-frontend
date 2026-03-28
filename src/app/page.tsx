@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { AIWarningBadge } from './components/AIWarningBadge';
 import { LinkCard } from './components/LinkCard';
+import { QuotedPost } from './components/QuotedPost';
 
 interface FeedItem {
   id: string;
@@ -17,6 +18,7 @@ interface FeedItem {
   replyCount: number;
   images: string[];
   links?: Array<{url: string; title?: string}>;
+  quotedPost?: any;
   // AI Detection fields
   aiScore?: number;
   isAI?: boolean;
@@ -601,6 +603,65 @@ export default function InteractivePage() {
           flex-shrink: 0;
         }
 
+        .quoted-post {
+          border: 1px solid rgba(0, 217, 255, 0.2);
+          border-radius: 8px;
+          padding: 12px;
+          margin-top: 12px;
+          background: rgba(0, 217, 255, 0.05);
+        }
+
+        .quoted-post-header {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12px;
+          margin-bottom: 8px;
+        }
+
+        .quoted-post-author {
+          font-weight: 600;
+          color: #00d9ff;
+        }
+
+        .quoted-post-handle {
+          color: rgba(255, 255, 255, 0.4);
+        }
+
+        .quoted-post-time {
+          color: rgba(255, 255, 255, 0.3);
+          font-size: 11px;
+        }
+
+        .quoted-post-text {
+          color: rgba(255, 255, 255, 0.85);
+          font-size: 13px;
+          line-height: 1.4;
+          margin-bottom: 8px;
+          word-break: break-word;
+        }
+
+        .quoted-post-images {
+          display: grid;
+          gap: 6px;
+          margin-bottom: 8px;
+        }
+
+        .quoted-post-images img {
+          width: 100%;
+          max-height: 200px;
+          object-fit: cover;
+          border-radius: 6px;
+          background: rgba(0, 217, 255, 0.1);
+        }
+
+        .quoted-post-stats {
+          display: flex;
+          gap: 16px;
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.4);
+        }
+
         /* Control Panel */
         .control-panel {
           position: fixed;
@@ -1163,6 +1224,8 @@ export default function InteractivePage() {
                     )}
 
                     <LinkCard links={post.links || []} />
+
+                    {post.quotedPost && <QuotedPost quotedPost={post.quotedPost} />}
 
                     <div className="feed-post-stats">
                       <span>💬 {post.replyCount}</span>
