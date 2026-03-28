@@ -35,8 +35,8 @@ export default function LoginPage() {
       localStorage.setItem('baleen_token', data.token);
       localStorage.setItem('baleen_user', JSON.stringify(data.user));
 
-      // Redirect to feeds
-      router.push('/feeds');
+      // Redirect to splash page
+      router.push('/');
     } catch (err: any) {
       setError('Network error. Check your connection.');
       setLoading(false);
