@@ -1048,7 +1048,7 @@ export default function InteractivePage() {
           </div>
 
           {feedLoading ? (
-            <div className="feed-loading">Loading feed...</div>
+            <div className="feed-loading">Filtering feed...</div>
           ) : feed.length === 0 ? (
             <div className="feed-loading">No posts found</div>
           ) : (
