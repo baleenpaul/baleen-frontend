@@ -18,6 +18,8 @@ interface FeedItem {
   likeCount: number;
   repostCount: number;
   replyCount: number;
+  liked: boolean;
+  reposted: boolean;
   images: string[];
   links?: Array<{url: string; title?: string}>;
   quotedPost?: any;
