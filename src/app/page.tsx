@@ -5,6 +5,8 @@ import Image from 'next/image';
 import { AIWarningBadge } from './components/AIWarningBadge';
 import { LinkCard } from './components/LinkCard';
 import { QuotedPost } from './components/QuotedPost';
+import { LikeButton } from './components/LikeButton';
+import { RepostButton } from './components/RepostButton';
 
 interface FeedItem {
   id: string;
@@ -546,6 +548,50 @@ export default function InteractivePage() {
 
         .feed-post-stats span:hover {
           color: rgba(0, 217, 255, 0.8);
+        }
+
+        .feed-post-interactions {
+          margin-top: 12px;
+        }
+
+        .stat-item {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .interaction-button {
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.5);
+          cursor: pointer;
+          font-size: 13px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          padding: 0;
+          transition: all 0.2s ease;
+        }
+
+        .interaction-button:hover {
+          color: rgba(0, 217, 255, 0.8);
+        }
+
+        .interaction-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .like-button .like-icon.liked {
+          color: #ff1493;
+        }
+
+        .repost-button .repost-icon.reposted {
+          color: #00d9ff;
+        }
+
+        .interaction-count {
+          font-size: 12px;
         }
 
         .feed-post-links {
@@ -1227,10 +1273,22 @@ export default function InteractivePage() {
 
                     {post.quotedPost && <QuotedPost quotedPost={post.quotedPost} />}
 
-                    <div className="feed-post-stats">
-                      <span>💬 {post.replyCount}</span>
-                      <span>🔄 {post.repostCount}</span>
-                      <span>❤️ {post.likeCount}</span>
+                    <div className="feed-post-interactions">
+                      <div className="feed-post-stats">
+                        <span className="stat-item">💬 {post.replyCount}</span>
+                        <LikeButton 
+                          postId={post.id} 
+                          platform={post.platform}
+                          initialLiked={post.liked || false}
+                          initialLikeCount={post.likeCount || 0}
+                        />
+                        <RepostButton 
+                          postId={post.id} 
+                          platform={post.platform}
+                          initialReposted={post.reposted || false}
+                          initialRepostCount={post.repostCount || 0}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
