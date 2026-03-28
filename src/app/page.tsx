@@ -10,6 +10,7 @@ import { RepostButton } from './components/RepostButton';
 
 interface FeedItem {
   id: string;
+  cid?: string; // Bluesky only
   platform: 'bluesky' | 'mastodon';
   author: string;
   authorHandle: string;
@@ -1281,12 +1282,14 @@ export default function InteractivePage() {
                         <LikeButton 
                           postId={post.id} 
                           platform={post.platform}
+                          cid={post.cid}
                           initialLiked={post.liked || false}
                           initialLikeCount={post.likeCount || 0}
                         />
                         <RepostButton 
                           postId={post.id} 
                           platform={post.platform}
+                          cid={post.cid}
                           initialReposted={post.reposted || false}
                           initialRepostCount={post.repostCount || 0}
                         />

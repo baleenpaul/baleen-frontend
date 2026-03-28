@@ -3,12 +3,13 @@ import React, { useState } from 'react';
 interface LikeButtonProps {
   postId: string;
   platform: 'bluesky' | 'mastodon';
+  cid?: string; // Bluesky only
   initialLiked: boolean;
   initialLikeCount: number;
   onLikeChange?: (liked: boolean, count: number) => void;
 }
 
-export function LikeButton({ postId, platform, initialLiked, initialLikeCount, onLikeChange }: LikeButtonProps) {
+export function LikeButton({ postId, platform, cid, initialLiked, initialLikeCount, onLikeChange }: LikeButtonProps) {
   const [liked, setLiked] = useState(initialLiked);
   const [likeCount, setLikeCount] = useState(initialLikeCount);
   const [loading, setLoading] = useState(false);
@@ -18,16 +19,23 @@ export function LikeButton({ postId, platform, initialLiked, initialLikeCount, o
       setLoading(true);
       const action = liked ? 'unlike' : 'like';
       
+      const body: any = {
+        postId,
+        platform,
+        action,
+      };
+      
+      // Add cid for Bluesky posts
+      if (platform === 'bluesky' && cid) {
+        body.cid = cid;
+      }
+      
       const response = await fetch('https://baleen-backend.onrender.com/interactions/like', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          postId,
-          platform,
-          action,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!response.ok) {
@@ -36,9 +44,9 @@ export function LikeButton({ postId, platform, initialLiked, initialLikeCount, o
       }
 
       const data = await response.json();
-      setLiked(data.liked);
-      setLikeCount(data.likeCount);
-      onLikeChange?.(data.liked, data.likeCount);
+      setLiked(data.result?.liked || !liked);
+      setLikeCount(data.result?.likeCount || likeCount);
+      onLikeChange?.(data.result?.liked || !liked, data.result?.likeCount || likeCount);
     } catch (error) {
       console.error('Error liking post:', error);
     } finally {
