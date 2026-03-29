@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import CredentialModal from '../components/CredentialModal';
 
 export default function FeedsPage() {
+  const router = useRouter();
   const [dragOver, setDragOver] = useState(false);
   const [connectedFeeds, setConnectedFeeds] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -39,15 +41,13 @@ export default function FeedsPage() {
     const source = e.dataTransfer!.getData('source');
     setDragOver(false);
 
-    if (source && !connectedFeeds.includes(source)) {
-      // For Bluesky and Mastodon, open credential modal
-      if (source === 'bluesky' || source === 'mastodon') {
-        setModalPlatform(source as 'bluesky' | 'mastodon');
-        setModalOpen(true);
-      } else {
-        // For other platforms, just add them (not yet implemented)
-        setConnectedFeeds([...connectedFeeds, source]);
-      }
+    // For Bluesky and Mastodon, always open credential modal (allows updating)
+    if (source === 'bluesky' || source === 'mastodon') {
+      setModalPlatform(source as 'bluesky' | 'mastodon');
+      setModalOpen(true);
+    } else if (source && !connectedFeeds.includes(source)) {
+      // For other platforms, just add them (not yet implemented)
+      setConnectedFeeds([...connectedFeeds, source]);
     }
   };
 
@@ -84,6 +84,29 @@ export default function FeedsPage() {
 
   return (
     <>
+      <div style={{
+        position: 'absolute',
+        top: '20px',
+        right: '20px',
+        zIndex: 100,
+      }}>
+        <button
+          onClick={() => router.push('/')}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#06b6d4',
+            color: '#0f172a',
+            border: 'none',
+            borderRadius: '6px',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: 'pointer',
+          }}
+        >
+          Go to Feed
+        </button>
+      </div>
+
       <div className="w-full h-full flex relative overflow-hidden" style={{ gap: '40px', padding: '60px 40px' }}>
         {/* Left panel: Social media icons */}
         <div style={{
