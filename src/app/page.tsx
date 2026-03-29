@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { AIWarningBadge } from './components/AIWarningBadge';
 import { LinkCard } from './components/LinkCard';
@@ -138,9 +139,8 @@ export default function InteractivePage() {
 
   const goToFeedPage = (event?: React.MouseEvent) => {
     if (event) event.stopPropagation();
-    if (currentMode === 'splash') {
-      setCurrentMode('feeds');
-    }
+    const router = useRouter();
+    router.push('/feeds');
   };
 
   const goToSplash = () => {
