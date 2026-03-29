@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import CredentialModal from '../components/CredentialModal';
+import CredentialModal from './components/CredentialModal';
 
 export default function FeedsPage() {
   const [dragOver, setDragOver] = useState(false);
