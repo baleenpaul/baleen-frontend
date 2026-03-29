@@ -34,6 +34,7 @@ interface FeedItem {
 }
 
 export default function InteractivePage() {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState<'landing' | 'feed' | 'control'>('landing');
   const [currentMode, setCurrentMode] = useState('splash');
@@ -139,7 +140,6 @@ export default function InteractivePage() {
 
   const goToFeedPage = (event?: React.MouseEvent) => {
     if (event) event.stopPropagation();
-    const router = useRouter();
     router.push('/feeds');
   };
 
