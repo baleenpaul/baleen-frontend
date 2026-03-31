@@ -97,7 +97,10 @@ export default function InteractivePage() {
       params.append('filterAI', 'true');
       params.append('sensitivity', aiSensitivity.toString());
       const filterUrl = `https://baleen-backend.onrender.com/feed?${params.toString()}`;
-      const response = await fetch(filterUrl);
+      const jwtToken = localStorage.getItem('baleen_token');
+      const response = await fetch(filterUrl, {
+        headers: jwtToken ? { 'Authorization': `Bearer ${jwtToken}` } : {}
+      });
       const data = await response.json();
       if (data.items) {
         // Sort by timestamp descending (newest first)
